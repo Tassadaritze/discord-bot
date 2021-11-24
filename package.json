@@ -1,0 +1,26 @@
+{
+  "name": "discord-bot",
+  "version": "0.1.0",
+  "description": "A personal bot for Discord",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "start": "node build/main.js"
+  },
+  "keywords": [],
+  "author": "tassad",
+  "license": "GPL-3.0-or-later",
+  "private": true,
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "eslint": "^8.3.0",
+    "typescript": "^4.5.2"
+  },
+  "dependencies": {
+    "discord.js": "^13.3.1",
+    "dotenv": "^10.0.0"
+  }
+}
