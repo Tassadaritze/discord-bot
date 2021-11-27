@@ -1,12 +1,15 @@
 import "../env/env.js";
-import { SlashCommandBuilder } from "@discordjs/builders";
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
+import fs from "fs";
 
-const commands = [
-    new SlashCommandBuilder().setName("ping").setDescription("Do I really need to explain")
-]
-    .map(command => command.toJSON());
+const commands = [];
+const commandFiles = fs.readdirSync("./build/commands").filter(file => file.endsWith(".js"));
+
+for (const file of commandFiles) {
+    const { default:command } = await import(`./commands/${file}`);
+    commands.push(command.data.toJSON());
+}
 
 if (process.env.DISCORD_TOKEN !== undefined
     && process.env.CLIENT_ID !== undefined
