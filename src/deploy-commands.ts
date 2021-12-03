@@ -13,12 +13,13 @@ for (const file of commandFiles) {
 
 if (process.env.DISCORD_TOKEN !== undefined
     && process.env.CLIENT_ID !== undefined
-    && process.env.DEV_GUILD_ID !== undefined) {
+    && process.env.GUILD_ID !== undefined) {
+
     const rest = new REST({ version: "9" }).setToken(process.env.DISCORD_TOKEN);
 
-    rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.DEV_GUILD_ID), { body: commands })
+    rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID), { body: commands })
         .then(() => console.log("Successfully registered application commands"))
-        .catch(console.error);
+        .catch(err => console.error(err));
 } else {
     throw TypeError;
 }

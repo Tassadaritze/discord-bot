@@ -1,19 +1,9 @@
 import "../env/env.js";
-import { Client, ClientOptions, Collection, Intents } from "discord.js";
 import fs from "fs";
-import { Command } from "./events/interactionCreate";
+import { Intents } from "discord.js";
+import ClientPlus from "./classes/ClientPlus.js";
 
-
-class ClientWithCommands extends Client {
-    commands: Collection<string, Command> = new Collection<string, Command>();
-
-    constructor(props: ClientOptions) {
-        super(props);
-    }
-}
-
-
-const client = new ClientWithCommands({ intents: [Intents.FLAGS.GUILDS] });
+const client = new ClientPlus({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
 const commandFiles = fs.readdirSync("./build/commands").filter(file => file.endsWith(".js"));
 
@@ -33,5 +23,5 @@ for (const file of eventFiles) {
     }
 }
 
-client.login(process.env.DISCORD_TOKEN)
+client.login()
     .catch(err => console.error(err));

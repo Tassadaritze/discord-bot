@@ -1,4 +1,4 @@
-import { Collection, CommandInteraction, Interaction } from "discord.js";
+import { Client, Collection, CommandInteraction, Interaction } from "discord.js";
 
 
 export type Command = {
@@ -9,7 +9,7 @@ function isCommand(test: unknown): test is Command {
     return (test as Command).execute !== undefined;
 }
 
-type ClientWithCommands = {
+interface ClientWithCommands extends Client {
     commands: Collection<string, Command>
 }
 
