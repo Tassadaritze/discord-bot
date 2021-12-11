@@ -1,12 +1,13 @@
 {
   "name": "discord-bot",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "A personal bot for Discord",
   "main": "main.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
+    "prebuild": "tsc --build --clean",
+    "build": "tsc --build",
     "start": "node build/main.js",
     "deployCommands": "node build/deploy-commands.js",
     "dumpMessages": "node build/dump-messages.js"

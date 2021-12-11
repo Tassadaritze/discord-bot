@@ -7,8 +7,8 @@ import { Channel, Client } from "discord.js";
 const startMarkovInterval = (markov: Markov, client: Client, channel: Channel) => {
     const markovTimer = setInterval(() => {
         const generated = markov.generate({
-            maxTries: 100,
-            filter: result => result.score > 3
+            maxTries: 1000,
+            filter: result => result.score > 10
         });
         console.log(generated);
         if (channel.isText() &&
