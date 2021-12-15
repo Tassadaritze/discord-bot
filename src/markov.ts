@@ -5,18 +5,18 @@ import { Channel, Client } from "discord.js";
 
 
 const startMarkovInterval = (markov: Markov, client: Client, channel: Channel) => {
-    const markovTimer = setInterval(() => {
-        const generated = markov.generate({
-            maxTries: 1000,
-            filter: result => result.score > 10
-        });
-        console.log(generated);
+    return setInterval(() => {
         if (channel.isText() &&
-            (!channel.lastMessage ||
-                channel.lastMessage.author.id !== client.user?.id)) channel.send(generated.string);
+            (channel.lastMessage &&
+                channel.lastMessage.author.id !== client.user?.id)) {
+            const generated = markov.generate({
+                maxTries: 1000,
+                filter: result => result.score > 10
+            });
+            console.log(generated);
+            channel.send(generated.string);
+        }
     }, 300000)
-
-    return markovTimer;
 }
 
 const startMarkovSpam = async (client: Client) => {
