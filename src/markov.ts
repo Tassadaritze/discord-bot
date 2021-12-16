@@ -6,9 +6,11 @@ import { Channel, Client } from "discord.js";
 
 const startMarkovInterval = (markov: Markov, client: Client, channel: Channel) => {
     return setInterval(() => {
-        if (channel.isText() &&
-            (channel.lastMessage &&
-                channel.lastMessage.author.id !== client.user?.id)) {
+        if (
+            channel.isText() &&
+            (channel.lastMessage && client.user &&
+                channel.lastMessage.author.id !== client.user.id)
+        ) {
             const generated = markov.generate({
                 maxTries: 1000,
                 filter: result => result.score > 10
