@@ -15,7 +15,7 @@ const startMarkovInterval = (markov: Markov, client: Client, channel: AnyChannel
                 maxTries: 1000,
                 filter: result => {
                     return (
-                        result.score > 10 ||
+                        result.score > 10 &&
                         result.refs.length > 1
                     );
                 }
