@@ -1,10 +1,10 @@
 import "../env/env.js";
 import fs from "fs";
 import Markov from "markov-strings";
-import { Channel, Client } from "discord.js";
+import { AnyChannel, Client } from "discord.js";
 
 
-const startMarkovInterval = (markov: Markov, client: Client, channel: Channel) => {
+const startMarkovInterval = (markov: Markov, client: Client, channel: AnyChannel) => {
     return setInterval(() => {
         if (
             channel.isText() &&
@@ -13,7 +13,12 @@ const startMarkovInterval = (markov: Markov, client: Client, channel: Channel) =
         ) {
             const generated = markov.generate({
                 maxTries: 1000,
-                filter: result => result.score > 10
+                filter: result => {
+                    return (
+                        result.score > 10 ||
+                        result.refs.length > 1
+                    );
+                }
             });
             console.log(generated);
             channel.send(generated.string);
