@@ -6,7 +6,7 @@ import fs from "fs";
 class MarkovManager {
     private readonly markovData: Markov;
     private markov: Record<string, NodeJS.Timer> | undefined;
-    private messageInterval = 10000; // 5 * 60 * 1000;
+    private messageInterval = 5 * 60 * 1000;
 
     constructor() {
         this.markovData = new Markov({ stateSize: 3 });
