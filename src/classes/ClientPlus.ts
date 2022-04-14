@@ -1,9 +1,10 @@
 import { Client, ClientOptions, Collection, TextChannel } from "discord.js";
 import { Command } from "../events/interactionCreate";
+import MarkovManager from "./MarkovManager.js";
 
 class ClientPlus extends Client {
     commands: Collection<string, Command> = new Collection<string, Command>();
-    markov: NodeJS.Timer | undefined;
+    markov: MarkovManager = new MarkovManager();
     eventReportChannel: TextChannel | undefined;
 
     constructor(props: ClientOptions) {

@@ -6,6 +6,6 @@ export default {
         .setName("ping")
         .setDescription("Replies with pong"),
     async execute(interaction: CommandInteraction) {
-        await interaction.reply("Pong!");
+        await interaction.reply("_Pong!_");
     }
 }
