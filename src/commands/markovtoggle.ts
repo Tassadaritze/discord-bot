@@ -11,7 +11,7 @@ export default {
         const markov = client.markov.getMarkov();
         if (markov && Object.keys(markov).includes(interaction.channelId)) {
             client.markov.stopMarkovSpam(interaction.channelId);
-            await interaction.reply("_I shouldn't shitpost in here any more? Fine..._")
+            await interaction.reply("_I shouldn't shitpost in here any more? Fine..._");
         } else {
             if (interaction.channel) {
                 client.markov.startMarkovSpam(client, interaction.channel);
