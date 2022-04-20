@@ -13,6 +13,7 @@ class MarkovManager {
         this.addData();
     }
 
+    // Imports data from plain text and exports it to file, or imports it from a previously exported file
     private addData = (): void => {
         const messages = fs.readFileSync("./message-dump.txt", "utf8");
         let messageArray = messages.split("\n");
@@ -32,6 +33,7 @@ class MarkovManager {
         return;
     };
 
+    // Sets markov interval in channel, and returns its id
     private startMarkovInterval = (markov: Markov, client: Client, channel: AnyChannel): NodeJS.Timer => {
         return setInterval(() => {
             if (
@@ -59,16 +61,18 @@ class MarkovManager {
         }, this.messageInterval);
     }
 
+    // Gets object containing channel ids and corresponding markov intervals
     getMarkov = (): Record<string, NodeJS.Timer> | undefined => {
         return this.markov;
     }
 
+    // Starts a new markov interval in provided channel, and adds entry to markov object
     startMarkovSpam = (client: Client, channel: AnyChannel): void => {
         this.markov = { ...this.markov, [channel.id]: this.startMarkovInterval(this.markovData, client, channel) };
         return;
     }
 
-    // Stops messaging in provided channel, and removes entry from markov object
+    // Stops the markov interval in provided channel, and removes entry from markov object
     stopMarkovSpam = (id: string): void => {
         const markov = this.getMarkov();
         if (markov && Object.keys(markov).includes(id)) {
