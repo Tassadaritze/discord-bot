@@ -24,7 +24,10 @@ if (process.env.DISCORD_TOKEN) {
             guilds.forEach(guild => {
                 if (client.user)
                     rest.put(Routes.applicationGuildCommands(client.user.id, guild.id), { body: commands })
-                        .then(() => console.log(`Successfully registered application commands for guild ${guild.name}`))
+                        .then(() => {
+                            console.log(`Successfully registered application commands for guild ${guild.name}`);
+                            client.destroy();
+                        })
                         .catch(err => console.error(err, `Error when registering application commands for guild ${guild.name}`));
             })
         })
