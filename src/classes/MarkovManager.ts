@@ -7,10 +7,23 @@ class MarkovManager {
     private readonly markovData: Markov;
     private markov: Record<string, NodeJS.Timer> | undefined;
     private messageInterval = 5 * 60 * 1000;
+    private exportInterval = 10 * 60 * 1000;
+    private previousExport: string | undefined;
 
     constructor() {
         this.markovData = new Markov({ stateSize: 3 });
         this.addData();
+
+        setInterval(() => {
+            const data = JSON.stringify(this.markovData.export());
+
+            if (data === this.previousExport)
+                return;
+
+            this.previousExport = data;
+            this.exportData();
+
+        }, this.exportInterval);
     }
 
     // Imports data from plain text and exports it to file, or imports it from a previously exported file
@@ -26,12 +39,18 @@ class MarkovManager {
             this.markovData.import(JSON.parse(corpus));
         } else {
             this.markovData.addData(messageArray);
-            fs.writeFileSync("./markov-corpus.json", JSON.stringify(this.markovData.export()));
-            console.log("Exported corpus");
+            this.exportData();
         }
         console.log("Finished adding data");
         return;
-    };
+    }
+
+    // Exports markov data to file
+    private exportData = (): void => {
+        fs.writeFileSync("./markov-corpus.json", JSON.stringify(this.markovData.export()));
+        console.log("Exported corpus");
+        return;
+    }
 
     // Sets markov interval in channel, and returns its id
     private startMarkovInterval = (markov: Markov, client: Client, channel: AnyChannel): NodeJS.Timer => {
@@ -59,6 +78,12 @@ class MarkovManager {
                 }
             }
         }, this.messageInterval);
+    }
+
+    // Adds a single string to markov data
+    addString = (string: string): void => {
+        this.markovData.addData([string]);
+        return;
     }
 
     // Gets object containing channel ids and corresponding markov intervals
