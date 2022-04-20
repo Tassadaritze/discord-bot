@@ -12,11 +12,11 @@ export default {
     name: "messageCreate",
     async execute(message: Message) {
         const client = message.client as ClientPlus;
-        if (message.author.id !== client.user?.id)
+        if (message.author.id !== client.user?.id && ["DEFAULT", "REPLY"].includes(message.type) && message.content.length > 0)
             client.markov.addString(message.content);
         if (message.author.id === "392352456303968256") {
             const guild = await message.client.guilds.fetch("464502358924197912");
-            await guild.roles.edit("816031494673661953", { color: randomRGB() }, "Blame Tessie");
+            await guild.roles.edit("966311863426088990", { color: randomRGB() }, "Blame Tessie");
         }
     }
 }
