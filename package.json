@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsc --watch",
-    "prebuild": "tsc --build --clean",
+    "prebuild": "rmdir /s /q build",
     "build": "tsc --build",
     "start": "node build/main.js",
     "deployCommands": "node build/deploy-commands.js",
