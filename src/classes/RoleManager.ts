@@ -13,13 +13,17 @@ class RoleManager {
 
     // Imports previously created list from file
     private import = (): void => {
-        if (fs.existsSync("./persistent.json")) {
-            this._roles = JSON.parse(fs.readFileSync("./persistent.json", "utf8"), (k, v) => {
+        try {
+            const data = fs.readFileSync("./persistent.json", "utf8");
+            this._roles = JSON.parse(data, (k, v) => {
                 if (typeof v === "object" && v !== null)
                     if (v.dataType === "Map")
                         return new Map(v.v);
                 return v;
             });
+        }
+        catch {
+            console.log("Couldn't read saved role colour randomizer data from disc")
         }
     };
 

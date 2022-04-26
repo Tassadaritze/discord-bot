@@ -33,11 +33,13 @@ class MarkovManager {
         messageArray.pop();
         console.log(messageArray);
         console.log("Started adding data");
-        if (fs.existsSync("./markov-corpus.json")) {
-            console.log("Found existing corpus, importing it instead");
+        try {
+            console.log("Trying to read potential existing corpus");
             const corpus = fs.readFileSync("./markov-corpus.json", "utf8");
             this.markovData.import(JSON.parse(corpus));
-        } else {
+        }
+        catch {
+            console.log("Couldn't read corpus, creating a new one");
             this.markovData.addData(messageArray);
             this.exportData();
         }
