@@ -72,7 +72,7 @@ class MarkovManager {
                     }
                 });
                 console.log(generated);
-                if (generated.string.includes("Index")) {
+                if (generated.string.toLowerCase().includes("index")) {
                     console.log("Incorrect opinion detected, activating override");
                     channel.send(`I was going to say something like \`${generated.string}\`, but then I remembered that's incorrect.`);
                 } else {
