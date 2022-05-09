@@ -1,4 +1,4 @@
-import { Client, Collection, CommandInteraction, Interaction } from "discord.js";
+import { ButtonInteraction, Client, Collection, CommandInteraction, Interaction } from "discord.js";
 
 
 export type Command = {
@@ -21,13 +21,19 @@ function isClientWithCommands(client: unknown): client is ClientWithCommands {
 export default {
     name: "interactionCreate",
     async execute(interaction: Interaction) {
-        if (!interaction.isCommand()) return;
+        if (interaction.isButton()) {
+            await handleButtonInteraction(interaction);
+            return;
+        } else if (!interaction.isCommand())
+            return;
 
-        if (!isClientWithCommands(interaction.client)) return;
+        if (!isClientWithCommands(interaction.client))
+            return;
 
         const command = interaction.client.commands.get(interaction.commandName);
 
-        if (!command || !isCommand(command)) return;
+        if (!command || !isCommand(command))
+            return;
 
         try {
             await command.execute(interaction);
@@ -36,4 +42,9 @@ export default {
             await interaction.reply({ content: "There was an error executing this command", ephemeral: true });
         }
     }
+}
+
+const handleButtonInteraction = async (interaction: ButtonInteraction) => {
+    console.log("[INTERACTION]", interaction, interaction.customId);
+    await interaction.reply({ content: "_Success!_", ephemeral: true });
 }

@@ -2,7 +2,7 @@ import {
     Message,
     MessageActionRow,
     MessageButton,
-    MessageOptions,
+    MessageOptions, MessageSelectMenu,
     TextChannel,
     User
 } from "discord.js";
@@ -20,26 +20,27 @@ class TicTacToe {
     #players: User[];
     #channel: TextChannel;
     #message: Message | undefined;
+    #gameActive = false;
 
     constructor(players: User[], channel: TextChannel) {
         this.#players = players;
         this.#channel = channel;
-        this.#update();
+        this.#update().catch(e => console.error(e));
     }
 
-    #update = (): void => {
+    #update = async (): Promise<void> => {
         const emoji = {
             x: "❌",
             o: "⭕"
         }
-        const message: MessageOptions = { components: [] };
-        for (let i = 0; i < this.#board.length; ++i) {    // iterate through rows
+        const message: MessageOptions = { content: `<@${this.#players[0].id}> vs. TBD`, components: [] };
+        for (let v = 0; v < this.#board.length; ++v) {    // iterate through rows
             const buttons = new MessageActionRow();
-            for (let j = 0; j < this.#board[i].length; ++j) {     // iterate through spaces
-                const space = this.#board[i][j];
+            for (let h = 0; h < this.#board[v].length; ++h) {     // iterate through spaces
+                const space = this.#board[v][h];
                 const button = new MessageButton()
                     .setStyle("SECONDARY")
-                    .setCustomId(`[${i},${j}]`);
+                    .setCustomId(`${this.#players[0].id}[${v},${h}]`);
                 if (space)
                     button.setEmoji(emoji[space]);
                 else
@@ -47,6 +48,16 @@ class TicTacToe {
                 buttons.addComponents(button);
             }
             message.components?.push(buttons);
+        }
+        if (this.#players.length < 2) {
+            this.#channel.guild.members.fetch()
+                .then(members => {
+                    const nonBotMembers = members.filter(member => !member.user.bot && member.id !== this.#players[0].id);
+                    message.components?.push(new MessageActionRow()
+                        .addComponents(new MessageSelectMenu()
+                            .setPlaceholder("Challenge a user...")));
+                })
+                .catch(e => console.error(e));
         }
         this.#channel.send(message)
             .then(message => this.#message = message);
