@@ -1,4 +1,11 @@
-import { ButtonInteraction, Client, Collection, CommandInteraction, Interaction } from "discord.js";
+import {
+    ButtonInteraction,
+    Client,
+    Collection,
+    CommandInteraction,
+    Interaction,
+    SelectMenuInteraction
+} from "discord.js";
 
 
 export type Command = {
@@ -24,6 +31,9 @@ export default {
         if (interaction.isButton()) {
             await handleButtonInteraction(interaction);
             return;
+        } else if (interaction.isSelectMenu()) {
+            await handleSelectMenuInteraction(interaction);
+            return;
         } else if (!interaction.isCommand())
             return;
 
@@ -45,6 +55,11 @@ export default {
 }
 
 const handleButtonInteraction = async (interaction: ButtonInteraction) => {
-    console.log("[INTERACTION]", interaction, interaction.customId);
+    console.log("[BUTTON INTERACTION]", interaction, interaction.customId);
+    await interaction.reply({ content: "_Success!_", ephemeral: true });
+}
+
+const handleSelectMenuInteraction = async (interaction: SelectMenuInteraction) => {
+    console.log("[SELECT MENU INTERACTION]", interaction, interaction.customId);
     await interaction.reply({ content: "_Success!_", ephemeral: true });
 }
