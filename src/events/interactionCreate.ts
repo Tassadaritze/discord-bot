@@ -6,6 +6,7 @@ import {
     Interaction,
     SelectMenuInteraction
 } from "discord.js";
+import ClientPlus from "../classes/ClientPlus.js";
 
 
 export type Command = {
@@ -61,5 +62,25 @@ const handleButtonInteraction = async (interaction: ButtonInteraction) => {
 
 const handleSelectMenuInteraction = async (interaction: SelectMenuInteraction) => {
     console.log("[SELECT MENU INTERACTION]", interaction, interaction.customId);
+
+    // the only current select menu has both minValues and maxValues of 1
+    if (interaction.values.length !== 1) {
+        console.error("[ERROR] Length of select menu interaction value array is somehow not 1.");
+        await interaction.reply({ content: "_It seems like an error occurred._", ephemeral: true });
+        return;
+    }
+
+    const client = interaction.client as ClientPlus;
+    const [channelId, userId] = interaction.customId.split(":");
+
+    // if game is not tracked on client, then we shouldn't be trying to do anything with it
+    if (!client.tictactoe.has(channelId) || !client.tictactoe.get(channelId)?.has(userId)) {
+        console.error("[ERROR] Tried to invite player to an untracked tic-tac-toe game.");
+        await interaction.reply({ content: "_It seems like an error occurred._", ephemeral: true });
+        return;
+    }
+
+    const user = await interaction.client.users.fetch(userId);
+
     await interaction.reply({ content: "_Success!_", ephemeral: true });
 }

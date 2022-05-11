@@ -1,9 +1,9 @@
 import {
     Collection,
-    CommandInteraction,
+    CommandInteraction, InteractionReplyOptions, Message,
     MessageActionRow,
     MessageButton,
-    MessageOptions, MessageSelectMenu, TextChannel,
+    MessageSelectMenu, TextChannel,
     User
 } from "discord.js";
 import ClientPlus from "./ClientPlus.js";
@@ -29,7 +29,7 @@ class TicTacToe {
         if (!(interaction.channel instanceof TextChannel))
             throw new TypeError("TicTacToe interaction channel is not instance of TextChannel");
         this.#channel = interaction.channel;
-        this.#initialize().catch(e => console.error(e));
+        this.#initialize().catch(console.error);
     }
 
     #initialize = async () => {
@@ -37,7 +37,7 @@ class TicTacToe {
             x: "❌",
             o: "⭕"
         }
-        let message: MessageOptions = { content: `<@${this.#players[0].id}> vs. TBD`, components: [] };
+        let message: InteractionReplyOptions = { content: `<@${this.#players[0].id}> vs. TBD`, components: [] };
         for (let v = 0; v < this.#board.length; ++v) {    // iterate through rows
             const buttons = new MessageActionRow();
             for (let h = 0; h < this.#board[v].length; ++h) {     // iterate through spaces
@@ -55,13 +55,13 @@ class TicTacToe {
         }
         if (this.#players.length < 2) {
             message = await this.#setupUserSelect(message);
-            await this.#interaction.reply(message);
+            await this.#interaction.reply({ ...message, fetchReply: true });
         } else {
             message.content = `<@${this.#players[0].id}> vs. <@${this.#players[1].id}>`;
-            await this.#interaction.reply(message);
+            await this.#interaction.reply({ ...message, fetchReply: true });
         }
 
-        // if message did not get overridden in #setupUserSelect, add it to the collection of running games
+        // if message did not get overridden in #setupUserSelect, add the TicTacToe instance to the collection of running games
         if (message.components) {
             const client = this.#interaction.client as ClientPlus;
             if (client.tictactoe.has(this.#channel.id))
@@ -71,7 +71,7 @@ class TicTacToe {
         }
     }
 
-    #setupUserSelect = async (message: MessageOptions): Promise<MessageOptions> => {
+    #setupUserSelect = async (message: InteractionReplyOptions): Promise<InteractionReplyOptions> => {
         const members = await this.#channel.guild.members.fetch();
         const nonBotMembers = members.filter(member => !member.user.bot && member.id !== this.#players[0].id);
         if (nonBotMembers.size > 0) {
@@ -91,7 +91,8 @@ class TicTacToe {
                     .addOptions({
                         label: member.displayName,
                         value: member.id,
-                        description: `${member.user.username}#${member.user.discriminator}`
+                        description: `${member.user.username}#${member.user.discriminator}`,
+                        emoji: "🇺"    // U+1F1FA -- U emoji for User
                     });
             });
             message.components?.push(new MessageActionRow().addComponents(userSelectMenu));
@@ -100,6 +101,10 @@ class TicTacToe {
         } else {
             return { content: "_Sorry, I couldn't find anyone on the server for you to play with!_" };
         }
+    }
+
+    #addPlayer = async (newPlayer: User) => {
+
     }
 }
 
