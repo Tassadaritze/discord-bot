@@ -57,7 +57,38 @@ export default {
 
 const handleButtonInteraction = async (interaction: ButtonInteraction) => {
     console.log("[BUTTON INTERACTION]", interaction, interaction.customId);
-    await interaction.reply({ content: "_Success!_", ephemeral: true });
+
+    const client = interaction.client as ClientPlus;
+    const [action, channelId, userId] = interaction.customId.split(":");
+
+    const tictactoe = client.tictactoe.get(channelId)?.get(userId);
+
+    // if game is not tracked on client, then we shouldn't be trying to do anything with it
+    if (!tictactoe) {
+        console.error("[ERROR] Tried to handle player invitation to an untracked tic-tac-toe game.");
+        await interaction.reply({ content: "_It seems like an error occurred._", ephemeral: true });
+        return;
+    }
+
+    /*
+    if (interaction.user.id !== tictactoe.players[1]) {
+        await interaction.reply({ content: `_You have not been invited to participate in this game!_`, ephemeral: true });
+        return;
+    }
+     */
+
+    switch (action) {
+    case "accept":
+        await tictactoe.acceptInvite(interaction);
+        break;
+    case "decline":
+        await tictactoe.declineInvite(interaction);
+        break;
+    default:
+        console.error("[ERROR] Got invalid value for tic-tac-toe action.");
+        await interaction.reply({ content: "_It seems like an error occurred._", ephemeral: true });
+        return;
+    }
 }
 
 const handleSelectMenuInteraction = async (interaction: SelectMenuInteraction) => {
@@ -73,14 +104,19 @@ const handleSelectMenuInteraction = async (interaction: SelectMenuInteraction) =
     const client = interaction.client as ClientPlus;
     const [channelId, userId] = interaction.customId.split(":");
 
+    const tictactoe = client.tictactoe.get(channelId)?.get(userId);
+
     // if game is not tracked on client, then we shouldn't be trying to do anything with it
-    if (!client.tictactoe.has(channelId) || !client.tictactoe.get(channelId)?.has(userId)) {
+    if (!tictactoe) {
         console.error("[ERROR] Tried to invite player to an untracked tic-tac-toe game.");
         await interaction.reply({ content: "_It seems like an error occurred._", ephemeral: true });
         return;
     }
 
-    const user = await interaction.client.users.fetch(userId);
-
-    await interaction.reply({ content: "_Success!_", ephemeral: true });
+    try {
+        await tictactoe.invitePlayer(interaction.values[0], interaction);
+    } catch (e) {
+        console.error(e);
+        await interaction.reply({ content: "_It seems like an error occurred._", ephemeral: true });
+    }
 }

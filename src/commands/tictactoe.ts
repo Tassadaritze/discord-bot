@@ -13,10 +13,14 @@ export default {
                 .setDescription("Pick your opponent (omit to let someone join later)")),
     async execute(interaction: CommandInteraction) {
         const opponent = interaction.options.getUser("opponent");
+
+        /*
         if (opponent?.bot) {
             await interaction.reply("_You can't challenge a bot!_");
             return;
         }
+
+         */
 
         const client = interaction.client as ClientPlus;
         if (interaction.channel && client.tictactoe.has(interaction.channel.id) && client.tictactoe.get(interaction.channel.id)?.has(interaction.user.id)) {
@@ -26,8 +30,8 @@ export default {
 
         let tictactoe: TicTacToe;
         if (opponent)
-            tictactoe = new TicTacToe([interaction.user, opponent], interaction);
+            tictactoe = new TicTacToe([interaction.user.id, opponent.id], interaction);
         else
-            tictactoe = new TicTacToe([interaction.user], interaction);
+            tictactoe = new TicTacToe([interaction.user.id], interaction);
     }
 }
