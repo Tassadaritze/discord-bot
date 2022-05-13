@@ -3,7 +3,7 @@ import fs from "fs";
 import { Intents } from "discord.js";
 import ClientPlus from "./classes/ClientPlus.js";
 
-const client = new ClientPlus({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_SCHEDULED_EVENTS] });
+const client = new ClientPlus({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_SCHEDULED_EVENTS] });
 
 const commandFiles = fs.readdirSync("./build/commands").filter(file => file.endsWith(".js"));
 
