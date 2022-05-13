@@ -14,13 +14,15 @@ export default {
     async execute(interaction: CommandInteraction) {
         const opponent = interaction.options.getUser("opponent");
 
-        /*
         if (opponent?.bot) {
             await interaction.reply("_You can't challenge a bot!_");
             return;
         }
 
-         */
+        if (opponent?.id === interaction.user.id) {
+            await interaction.reply("_You can't challenge yourself! (although you should)_");
+            return;
+        }
 
         const client = interaction.client as ClientPlus;
         if (interaction.channel && client.tictactoe.has(interaction.channel.id) && client.tictactoe.get(interaction.channel.id)?.has(interaction.user.id)) {

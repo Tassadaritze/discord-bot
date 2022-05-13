@@ -7,6 +7,7 @@ import {
     SelectMenuInteraction
 } from "discord.js";
 import ClientPlus from "../classes/ClientPlus.js";
+import TicTacToe from "../classes/TicTacToe.js";
 
 
 export type Command = {
@@ -59,23 +60,30 @@ const handleButtonInteraction = async (interaction: ButtonInteraction) => {
     console.log("[BUTTON INTERACTION]", interaction, interaction.customId);
 
     const client = interaction.client as ClientPlus;
-    const [action, channelId, userId] = interaction.customId.split(":");
+    const [channelId, userId, action] = interaction.customId.split(":");
 
     const tictactoe = client.tictactoe.get(channelId)?.get(userId);
 
     // if game is not tracked on client, then we shouldn't be trying to do anything with it
     if (!tictactoe) {
-        console.error("[ERROR] Tried to handle player invitation to an untracked tic-tac-toe game.");
-        await interaction.reply({ content: "_It seems like an error occurred._", ephemeral: true });
+        await interaction.reply({ content: "_That game has already ended._", ephemeral: true });
         return;
     }
 
-    /*
+    if (action === "accept" || action === "decline")
+        await handleTicTacToeInvitation(interaction, tictactoe, action);
+    else
+        await handleTicTacToeMove(interaction, tictactoe, action);
+}
+
+const handleTicTacToeInvitation = async (interaction: ButtonInteraction, tictactoe: TicTacToe, action: string) => {
     if (interaction.user.id !== tictactoe.players[1]) {
-        await interaction.reply({ content: `_You have not been invited to participate in this game!_`, ephemeral: true });
+        await interaction.reply({
+            content: `_You have not been invited to participate in this game!_`,
+            ephemeral: true
+        });
         return;
     }
-     */
 
     switch (action) {
     case "accept":
@@ -89,6 +97,30 @@ const handleButtonInteraction = async (interaction: ButtonInteraction) => {
         await interaction.reply({ content: "_It seems like an error occurred._", ephemeral: true });
         return;
     }
+};
+
+const handleTicTacToeMove = async (interaction: ButtonInteraction, tictactoe: TicTacToe, action: string) => {
+    if (!tictactoe.players.includes(interaction.user.id)) {
+        await interaction.reply({
+            content: `_You are not a participant in this game!_`,
+            ephemeral: true
+        });
+        return;
+    }
+
+    if (
+        tictactoe.isXTurn && interaction.user.id === tictactoe.players[1] ||
+        !tictactoe.isXTurn && interaction.user.id === tictactoe.players[0]
+    ) {
+        await interaction.reply({
+            content: `_It's not your turn!_`,
+            ephemeral: true
+        });
+        return;
+    }
+
+    const [v, h] = action.split(",");
+    await tictactoe.takeTurn(+v, +h, interaction);
 }
 
 const handleSelectMenuInteraction = async (interaction: SelectMenuInteraction) => {
@@ -110,6 +142,12 @@ const handleSelectMenuInteraction = async (interaction: SelectMenuInteraction) =
     if (!tictactoe) {
         console.error("[ERROR] Tried to invite player to an untracked tic-tac-toe game.");
         await interaction.reply({ content: "_It seems like an error occurred._", ephemeral: true });
+        return;
+    }
+
+    // only the user who created the game may invite players
+    if (tictactoe.players[0] !== interaction.user.id) {
+        await interaction.reply({ content: "_Only the game owner may invite players!_", ephemeral: true });
         return;
     }
 
