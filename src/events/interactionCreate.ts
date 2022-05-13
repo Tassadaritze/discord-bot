@@ -57,7 +57,7 @@ export default {
 }
 
 const handleButtonInteraction = async (interaction: ButtonInteraction) => {
-    console.log("[BUTTON INTERACTION]", interaction, interaction.customId);
+    // console.log("[BUTTON INTERACTION]", interaction, interaction.customId);
 
     const client = interaction.client as ClientPlus;
     const [channelId, userId, action] = interaction.customId.split(":");
@@ -124,7 +124,7 @@ const handleTicTacToeMove = async (interaction: ButtonInteraction, tictactoe: Ti
 }
 
 const handleSelectMenuInteraction = async (interaction: SelectMenuInteraction) => {
-    console.log("[SELECT MENU INTERACTION]", interaction, interaction.customId);
+    // console.log("[SELECT MENU INTERACTION]", interaction, interaction.customId);
 
     // the only current select menu has both minValues and maxValues of 1
     if (interaction.values.length !== 1) {
@@ -140,8 +140,7 @@ const handleSelectMenuInteraction = async (interaction: SelectMenuInteraction) =
 
     // if game is not tracked on client, then we shouldn't be trying to do anything with it
     if (!tictactoe) {
-        console.error("[ERROR] Tried to invite player to an untracked tic-tac-toe game.");
-        await interaction.reply({ content: "_It seems like an error occurred._", ephemeral: true });
+        await interaction.reply({ content: "_That game has already ended._", ephemeral: true });
         return;
     }
 
