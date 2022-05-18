@@ -24,13 +24,13 @@ export default {
 
         let data = await response.json();
         if (!isPostData(data)) {
-            await interaction.editReply(`**${tag ? tag : "random"}:** _Danbooru has returned an error.${!nsfw ? " (Trying this again in an NSFW channel might help.)" : ""}_`);
+            await interaction.editReply(`**${tag ? `${tag}`.replaceAll("_", "\\_") : "random"}:** _Danbooru has returned an error.${!nsfw ? " (Trying this again in an NSFW channel might help.)" : ""}_`);
             return;
         }
 
         const image = data.file_size > 8 * 1024 * 1024 ? sanitize(data.large_file_url) : sanitize(data.file_url);    // 8 MiB
         await interaction.editReply({
-            content: image ? `**${tag ? tag : "random"}:**` : "_Couldn't download image from unsafe URL._",
+            content: image ? `**${tag ? `${tag}`.replaceAll("_", "\\_") : "random"}:**` : "_Couldn't download image from unsafe URL._",
             files: image ? [image] : undefined
         });
     }
