@@ -15,18 +15,14 @@ export default {
     async execute(interaction: CommandInteraction) {
         let tag = interaction.options.get("tag")?.value;
         if (typeof tag === "string")
-            tag = tag.replace(" ", "_");
+            tag = tag.trim().replaceAll(" ", "_");
 
         let response;
         const nsfw = interaction.channel instanceof TextChannel && interaction.channel.nsfw;
         if (nsfw)
-            response = await fetch(tag ?
-                `https://danbooru.donmai.us/posts/random.json?tags=${tag}&login=${process.env.DANBOORU_USERNAME}&api_key=${process.env.DANBOORU_API_KEY}` :
-                `https://danbooru.donmai.us/posts/random.json?login=${process.env.DANBOORU_USERNAME}&api_key=${process.env.DANBOORU_API_KEY}`);
+            response = await fetch(`https://danbooru.donmai.us/posts/random.json?${tag ? `tags=${tag}&` : ""}login=${process.env.DANBOORU_USERNAME}&api_key=${process.env.DANBOORU_API_KEY}`);
         else
-            response = await fetch(tag ?
-                `https://danbooru.donmai.us/posts/random.json?tags=rating:safe+${tag}&login=${process.env.DANBOORU_USERNAME}&api_key=${process.env.DANBOORU_API_KEY}` :
-                `https://danbooru.donmai.us/posts/random.json?tags=rating:safe&login=${process.env.DANBOORU_USERNAME}&api_key=${process.env.DANBOORU_API_KEY}`);
+            response = await fetch(`https://danbooru.donmai.us/posts/random.json?tags=rating:safe${tag ? `+${tag}` : ""}&login=${process.env.DANBOORU_USERNAME}&api_key=${process.env.DANBOORU_API_KEY}`);
 
         let data = await response.json();
         if (!isPostData(data)) {
