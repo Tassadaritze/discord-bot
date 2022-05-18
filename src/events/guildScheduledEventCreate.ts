@@ -5,6 +5,7 @@ export default {
     name: "guildScheduledEventCreate",
     async execute(guildScheduledEvent: GuildScheduledEvent) {
         const client = guildScheduledEvent.client as ClientPlus;
-        client.eventReportChannel?.send(`Event **${guildScheduledEvent.name}** was scheduled for **${guildScheduledEvent.scheduledStartAt.toUTCString()}**.`);
+        if (guildScheduledEvent.guildId === client.eventReportChannel?.guildId)
+            client.eventReportChannel?.send(`Event **${guildScheduledEvent.name}** was scheduled for **${guildScheduledEvent.scheduledStartAt.toUTCString()}**.`);
     }
 }
