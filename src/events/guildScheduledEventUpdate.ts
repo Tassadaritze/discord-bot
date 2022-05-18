@@ -1,5 +1,6 @@
 import { GuildScheduledEvent } from "discord.js";
 import ClientPlus from "../classes/ClientPlus";
+import { toUTC } from "./guildScheduledEventCreate.js";
 
 export default {
     name: "guildScheduledEventUpdate",
@@ -10,7 +11,7 @@ export default {
             oldGuildScheduledEvent.scheduledStartAt !== newGuildScheduledEvent.scheduledStartAt &&
             newGuildScheduledEvent.guildId === client.eventReportChannel?.guildId
         ) {
-            client.eventReportChannel?.send(`Event **${newGuildScheduledEvent.name}**, previously scheduled for ${oldGuildScheduledEvent.scheduledStartAt.toUTCString()} will now start at **${newGuildScheduledEvent.scheduledStartAt.toUTCString()}**.`);
+            client.eventReportChannel?.send(`Event **${newGuildScheduledEvent.name},** previously scheduled for ${toUTC(oldGuildScheduledEvent.scheduledStartAt.toUTCString())}, will now start at **${toUTC(newGuildScheduledEvent.scheduledStartAt.toUTCString())}.**`);
         }
     }
 }
