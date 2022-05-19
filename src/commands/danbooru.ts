@@ -13,11 +13,11 @@ export default {
                 .setName("tag")
                 .setDescription("Tag to search (omit for a random image)")),
     async execute(interaction: CommandInteraction) {
+        await interaction.deferReply();
+
         let tag = interaction.options.get("tag")?.value;
         if (typeof tag === "string")
             tag = tag.trim().replaceAll(" ", "_");
-
-        await interaction.deferReply();
 
         const nsfw = interaction.channel instanceof TextChannel && interaction.channel.nsfw;
         const response = await fetch(`https://danbooru.donmai.us/posts/random.json?tags=${!nsfw ? "rating:safe" : ""}${tag ? `+${tag}` : ""}&login=${process.env.DANBOORU_USERNAME}&api_key=${process.env.DANBOORU_API_KEY}`);
