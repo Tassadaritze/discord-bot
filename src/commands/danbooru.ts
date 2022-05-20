@@ -36,13 +36,14 @@ export default {
     }
 };
 
-const sanitize = (url: string): string | null => {
+export const sanitize = (url: string): string | null => {
     const SAFE_URL_PATTERN = /^(?:(?:https?|mailto|ftp|tel|file):|[^&:/?#]*(?:[/?#]|$))/gi;
 
     if (url.match(SAFE_URL_PATTERN)) return url;
     else return null;
 };
 
+// not "POST data", but "post data"
 type PostData = {
     file_size: number,
     file_url: string,

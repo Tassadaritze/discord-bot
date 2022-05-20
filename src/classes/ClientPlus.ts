@@ -9,6 +9,7 @@ class ClientPlus extends Client {
     markov: MarkovManager = new MarkovManager();
     roles: RoleManager = new RoleManager();
     tictactoe = new Collection<string, Collection<string, TicTacToe>>();    // { channelId: { userId0: TicTacToe0, ..., userIdN: TicTacToeN } }
+    redditAccessToken: string | null = null;
     eventReportChannel: TextChannel | undefined;
 
     constructor(props: ClientOptions) {
