@@ -23,16 +23,26 @@ export default {
         const response = await fetch(`https://danbooru.donmai.us/posts/random.json?tags=${!nsfw ? "rating:safe" : ""}${tag ? `+${tag}` : ""}&login=${process.env.DANBOORU_USERNAME}&api_key=${process.env.DANBOORU_API_KEY}`);
 
         let data = await response.json();
+        console.log("[GET DANBOORU POST]", data);
         if (!isPostData(data)) {
-            await interaction.editReply(`**${tag ? `${tag}`.replaceAll("_", "\\_") : "random"}:** _Danbooru has returned an error.${!nsfw ? " (Trying this again in an NSFW channel might help.)" : ""}_`);
+            interaction.editReply(`**${tag ? `${tag}`.replaceAll("_", "\\_") : "random"}:** _Danbooru has returned an error.${!nsfw ? " (Trying this again in an NSFW channel might help.)" : ""}_`)
+                .catch(console.error);
             return;
         }
 
         const image = data.file_size > 8 * 1024 * 1024 ? sanitize(data.large_file_url) : sanitize(data.file_url);    // 8 MiB
-        await interaction.editReply({
+        if (data.file_size > 8 * 1024 * 1024 && data.large_file_url === data.file_url) {
+            interaction.editReply(`**${tag ? `${tag}`.replaceAll("_", "\\_") : "random"}:** _Image too large, posting link instead:_`)
+                .catch(console.error);
+            if (interaction.channel)
+                await interaction.channel.send(data.file_url);
+            return;
+        }
+
+        interaction.editReply({
             content: image ? `**${tag ? `${tag}`.replaceAll("_", "\\_") : "random"}:**` : "_Couldn't download image from unsafe URL._",
             files: image ? [image] : undefined
-        });
+        }).catch(console.error);
     }
 };
 
