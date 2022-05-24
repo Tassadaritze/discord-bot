@@ -1,5 +1,6 @@
 import { ColorResolvable, Guild, User } from "discord.js";
 import fs from "fs";
+import winston from "winston";
 
 // Keeps track of ids of users who have opted in to role colour randomising.
 // Also stores the ids of the guilds they opted in on, and the corresponding role and its id
@@ -23,7 +24,7 @@ class RoleManager {
             });
         }
         catch {
-            console.log("Couldn't read saved role colour randomizer data from disc")
+            winston.info("Couldn't read saved role colour randomizer data from disc")
         }
     };
 
@@ -57,7 +58,7 @@ class RoleManager {
             })
                 .then(role => {
                     member.roles.add(role)
-                        .catch(err => console.error(err, `Error adding role colour randomiser role to member ${member.displayName}`));
+                        .catch(winston.error);
                     // If user is already stored, add to their entry; else make a new entry
                     if (this.roles.has(user.id))
                         this.roles.get(user.id)?.set(guild.id, role.id);
@@ -65,7 +66,7 @@ class RoleManager {
                         this.roles.set(user.id, new Map<string, string>().set(guild.id, role.id));
                     this.export();
                 })
-                .catch(err => console.error(err, "Error making new role for role colour randomiser"));
+                .catch(winston.error);
         }
     };
 
@@ -75,7 +76,7 @@ class RoleManager {
         const guildEntry = this.roles.get(user.id)?.get(guild.id);
         if (guildEntry)
             guild.roles.delete(guildEntry)
-                .catch(err => console.error(err, `Error deleting role with id ${guildEntry} for user ${user.username}`));
+                .catch(winston.error);
         this.roles.get(user.id)?.delete(guild.id);
         if (userEntry && userEntry.size < 1)
             this.roles.delete(user.id);
@@ -87,7 +88,7 @@ class RoleManager {
         const guildEntry = this.roles.get(user.id)?.get(guild.id);
         if (guildEntry)
             guild.roles.edit(guildEntry, { color: this.randomRGB() }, "Blame Tessie")
-                .catch(err => console.error(err, `Error randomising role colour for role with id ${guildEntry} on user ${user.username}`));
+                .catch(winston.error);
     };
 
     // Get a list of user ids and their corresponding role ids

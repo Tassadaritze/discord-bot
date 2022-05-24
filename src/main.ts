@@ -1,7 +1,11 @@
 import "../env/env.js";
 import fs from "fs";
 import { Intents } from "discord.js";
+import winston from "winston";
 import ClientPlus from "./classes/ClientPlus.js";
+import initialize from "./log.js";
+
+initialize();    // initialize logger
 
 const client = new ClientPlus({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_SCHEDULED_EVENTS] });
 
@@ -24,4 +28,4 @@ for (const file of eventFiles) {
 }
 
 client.login()
-    .catch(err => console.error(err));
+    .catch(winston.error);

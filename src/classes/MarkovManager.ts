@@ -1,6 +1,7 @@
 import Markov from "markov-strings";
 import { AnyChannel, Client } from "discord.js";
 import fs from "fs";
+import winston from "winston";
 
 
 class MarkovManager {
@@ -31,26 +32,26 @@ class MarkovManager {
         const messages = fs.readFileSync("./message-dump.txt", "utf8");
         let messageArray = messages.split("\n");
         messageArray.pop();
-        console.log(messageArray);
-        console.log("Started adding data");
+        // console.log(messageArray);
+        winston.info("Started adding data");
         try {
-            console.log("Trying to read potential existing corpus");
+            winston.info("Trying to read potential existing corpus");
             const corpus = fs.readFileSync("./markov-corpus.json", "utf8");
             this.markovData.import(JSON.parse(corpus));
         }
         catch {
-            console.log("Couldn't read corpus, creating a new one");
+            winston.info("Couldn't read corpus, creating a new one");
             this.markovData.addData(messageArray);
             this.exportData();
         }
-        console.log("Finished adding data");
+        winston.info("Finished adding data");
         return;
     }
 
     // Exports markov data to file
     private exportData = (): void => {
         fs.writeFileSync("./markov-corpus.json", JSON.stringify(this.markovData.export()));
-        console.log("Exported corpus");
+        winston.info("Exported corpus");
         return;
     }
 
@@ -71,9 +72,9 @@ class MarkovManager {
                         );
                     }
                 });
-                console.log(generated);
+                winston.info(generated);
                 if (generated.string.toLowerCase().includes("index")) {
-                    console.log("Incorrect opinion detected, activating override");
+                    winston.silly("Incorrect opinion detected, activating override");
                     channel.send(`I was going to say something like \`${generated.string}\`, but then I remembered that's incorrect.`);
                 } else {
                     channel.send(generated.string);
@@ -106,7 +107,7 @@ class MarkovManager {
             clearInterval(markov[id]);
             delete markov[id];
         } else {
-            console.error(`Couldn't clear markov interval in channel with id ${id}`);
+            winston.error(`Couldn't clear markov interval in channel with id ${id}`);
         }
         return;
     }

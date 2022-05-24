@@ -6,6 +6,7 @@ import {
     Interaction,
     SelectMenuInteraction
 } from "discord.js";
+import winston from "winston";
 import ClientPlus from "../classes/ClientPlus.js";
 import TicTacToe from "../classes/TicTacToe.js";
 
@@ -50,7 +51,7 @@ export default {
         try {
             await command.execute(interaction);
         } catch (error) {
-            console.error(error);
+            winston.error(error);
             await interaction.reply({ content: "There was an error executing this command", ephemeral: true });
         }
     }
@@ -93,7 +94,7 @@ const handleTicTacToeInvitation = async (interaction: ButtonInteraction, tictact
         await tictactoe.declineInvite(interaction);
         break;
     default:
-        console.error("[ERROR] Got invalid value for tic-tac-toe action.");
+        winston.error("[ERROR] Got invalid value for tic-tac-toe action.");
         await interaction.reply({ content: "_It seems like an error occurred._", ephemeral: true });
         return;
     }
@@ -128,7 +129,7 @@ const handleSelectMenuInteraction = async (interaction: SelectMenuInteraction) =
 
     // the only current select menu has both minValues and maxValues of 1
     if (interaction.values.length !== 1) {
-        console.error("[ERROR] Length of select menu interaction value array is somehow not 1.");
+        winston.error("[ERROR] Length of select menu interaction value array is somehow not 1.");
         await interaction.reply({ content: "_It seems like an error occurred._", ephemeral: true });
         return;
     }
@@ -153,7 +154,7 @@ const handleSelectMenuInteraction = async (interaction: SelectMenuInteraction) =
     try {
         await tictactoe.invitePlayer(interaction.values[0], interaction);
     } catch (e) {
-        console.error(e);
+        winston.error(e);
         await interaction.reply({ content: "_It seems like an error occurred._", ephemeral: true });
     }
 }

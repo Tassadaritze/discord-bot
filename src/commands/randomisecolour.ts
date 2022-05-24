@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { CommandInteraction } from "discord.js";
+import winston from "winston";
 import ClientPlus from "../classes/ClientPlus";
 
 export default {
@@ -24,7 +25,7 @@ export default {
                 await interaction.reply("_One step closer to turning this chat into a Christmas tree._");
             }
         } else {
-            console.error("interaction.guild was null when adding/removing user to/from the role colour randomiser");
+            winston.error("interaction.guild was null when adding/removing user to/from the role colour randomiser");
         }
     }
 };

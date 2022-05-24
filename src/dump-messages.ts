@@ -1,6 +1,7 @@
 import "../env/env.js";
 import fsPromises from "fs/promises";
 import { Client, Collection, Intents, Message, Snowflake, TextChannel } from "discord.js";
+import winston from "winston";
 
 
 const getChannelMessages = async (channel: TextChannel): Promise<string[]> => {
@@ -27,7 +28,7 @@ if (process.env.DISCORD_TOKEN !== undefined) {
 
     const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
     await client.login();
-    await client.on("ready", () => console.log("Client ready"));
+    await client.on("ready", () => { winston.info("Client ready") });
 
     const startedAt = Date.now();
 
@@ -56,13 +57,13 @@ if (process.env.DISCORD_TOKEN !== undefined) {
             for (const channel of textChannels) {
                 if (channel[1] instanceof TextChannel) {
                     const messages = await getChannelMessages(channel[1]);
-                    console.log(messages);
+                    winston.info(messages);
                     const messageString = messages.join("");
                     fsPromises.appendFile("message-dump.txt", messageString, "utf8");
                 }
             }
             const timeElapsed = Date.now() - startedAt;
-            console.log(`Dumping messages finished in ${timeElapsed}ms`);
+            winston.info(`Dumping messages finished in ${timeElapsed}ms`);
         }
 
     }

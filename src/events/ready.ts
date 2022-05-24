@@ -1,4 +1,5 @@
 import { TextChannel } from "discord.js";
+import winston from "winston";
 import ClientPlus from "../classes/ClientPlus";
 
 export default {
@@ -6,7 +7,7 @@ export default {
     once: true,
     execute(client: ClientPlus) {
         if (client.user) {
-            console.log(`Ready! Logged in as ${client.user.tag}`);
+            winston.info(`Ready! Logged in as ${client.user.tag}`);
             client.channels.fetch("464502359372857355")
                 .then(channel => {
                     if (channel)
