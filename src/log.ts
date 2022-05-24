@@ -7,7 +7,7 @@ const initialize = () => {
         format: winston.format.combine(
             winston.format.colorize({ colors: { error: "red", info: "cyan", debug: "magenta", silly: "brightGreen" } }),
             winston.format.timestamp({ format: "YYYY-MM-DD hh:mm:ss" }),
-            winston.format.printf(info => `${info.timestamp} ${info.level}: ${typeof info.message === "object" ? util.inspect(info.message) : info.message}`)
+            winston.format.printf(info => `${info.timestamp} ${info.level}: ${typeof info.message === "object" ? util.inspect(info.message, { colors: true }) : info.message}`)
         ),
         level: "silly",
         transports: [
