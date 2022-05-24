@@ -27,8 +27,8 @@ const initialize = () => {
     winston.info("info test");
     winston.debug("debug test");
     winston.silly("silly test");
-     */
     winston.info({ nested: { object: "test" } });
+     */
 }
 
 export default initialize;
