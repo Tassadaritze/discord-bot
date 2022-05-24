@@ -4,6 +4,7 @@ import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import fs from "fs";
+import winston from "winston";
 
 const commands: SlashCommandBuilder[] = [];
 const commandFiles = fs.readdirSync("./build/commands").filter(file => file.endsWith(".js"));
@@ -25,13 +26,13 @@ if (process.env.DISCORD_TOKEN) {
                 if (client.user)
                     rest.put(Routes.applicationGuildCommands(client.user.id, guild.id), { body: commands })
                         .then(() => {
-                            console.log(`Successfully registered application commands for guild ${guild.name}`);
+                            winston.info(`Successfully registered application commands for guild ${guild.name}`);
                             client.destroy();
                         })
-                        .catch(err => console.error(err, `Error when registering application commands for guild ${guild.name}`));
+                        .catch(winston.error);
             })
         })
-        .catch(err => console.error(err, "Error when fetching guilds"));
+        .catch(winston.error);
 } else {
     throw TypeError;
 }

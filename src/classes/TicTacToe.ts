@@ -6,6 +6,7 @@ import {
     MessageButton,
     MessageSelectMenu, SelectMenuInteraction, Snowflake, TextChannel,
 } from "discord.js";
+import winston from "winston";
 import ClientPlus from "./ClientPlus.js";
 
 type TicTacToeSpace = "x" | "o" | null;
@@ -35,7 +36,7 @@ class TicTacToe {
         if (!(interaction.channel instanceof TextChannel))
             throw new TypeError("TicTacToe interaction channel is not instance of TextChannel");
         this.#channel = interaction.channel;
-        this.#initialize().catch(console.error);
+        this.#initialize().catch(winston.error);
     }
 
     #initialize = async () => {

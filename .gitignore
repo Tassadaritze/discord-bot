@@ -1,9 +1,9 @@
 # Project exclude paths
 /node_modules/
 /build/
+/logs/
+/.idea/
 /*.env
 /*.txt
 /*.json
 /*.bat
-/.idea/
-/package-lock.json
