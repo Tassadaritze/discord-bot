@@ -1,5 +1,5 @@
 import "../../env/env.js";
-import fetch, { Response } from "node-fetch";
+import fetch from "node-fetch";
 import { SlashCommandBuilder, SlashCommandStringOption } from "@discordjs/builders";
 import { CommandInteraction, TextChannel } from "discord.js";
 import winston from "winston";
@@ -21,12 +21,18 @@ export default {
             tag = tag.trim().replaceAll(" ", "_");
 
         const nsfw = interaction.channel instanceof TextChannel && interaction.channel.nsfw;
-        const response = await fetch(`https://danbooru.donmai.us/posts/random.json?tags=${!nsfw ? "rating:safe" : ""}${tag ? `+${tag}` : ""}&login=${process.env.DANBOORU_USERNAME}&api_key=${process.env.DANBOORU_API_KEY}`)
-            .catch(winston.error);
+        let response;
+        try {
+            response = await fetch(`https://danbooru.donmai.us/posts/random.json?tags=${!nsfw ? "rating:safe" : ""}${tag ? `+${tag}` : ""}&login=${process.env.DANBOORU_USERNAME}&api_key=${process.env.DANBOORU_API_KEY}`);
+        }
+        catch (e) {
+            winston.error(e);
+            interaction.editReply(`**${tag ? `${tag}`.replaceAll("_", "\\_") : "random"}:** _Couldn't connect to Danbooru._`)
+                .catch(winston.error);
+            return;
+        }
 
-        let data;
-        if (response instanceof Response)
-            data = await response.json();
+        const data = await response.json();
         winston.info(data);
         if (!isPostData(data)) {
             interaction.editReply(`**${tag ? `${tag}`.replaceAll("_", "\\_") : "random"}:** _Danbooru has returned an error.${!nsfw ? " (Trying this again in an NSFW channel might help.)" : ""}_`)
