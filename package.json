@@ -1,6 +1,6 @@
 {
   "name": "discord-bot",
-  "version": "0.10.2",
+  "version": "0.10.3",
   "description": "A personal bot for Discord",
   "main": "main.js",
   "type": "module",
