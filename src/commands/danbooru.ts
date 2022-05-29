@@ -23,7 +23,7 @@ export default {
         const nsfw = interaction.channel instanceof TextChannel && interaction.channel.nsfw;
         let response;
         try {
-            response = await fetch(`https://danbooru.donmai.us/posts/random.json?tags=${!nsfw ? "rating:safe" : ""}${tag ? `+${tag}` : ""}&login=${process.env.DANBOORU_USERNAME}&api_key=${process.env.DANBOORU_API_KEY}`);
+            response = await fetch(`https://danbooru.donmai.us/posts/random.json?tags=${!nsfw ? "rating:general" : ""}${tag ? `+${tag}` : ""}&login=${process.env.DANBOORU_USERNAME}&api_key=${process.env.DANBOORU_API_KEY}`);
         }
         catch (e) {
             winston.error(e);
