@@ -29,9 +29,15 @@ class MarkovManager {
 
     // Imports data from plain text and exports it to file, or imports it from a previously exported file
     private addData = (): void => {
-        const messages = fs.readFileSync("./message-dump.txt", "utf8");
-        let messageArray = messages.split("\n");
-        messageArray.pop();
+        let messageArray;
+        try {
+            const messages = fs.readFileSync("./message-dump.txt", "utf8");
+            messageArray = messages.split("\n");
+            messageArray.pop();
+        }
+        catch {
+            winston.info("Couldn't read message dump");
+        }
         // console.log(messageArray);
         winston.info("Started adding data");
         try {
@@ -40,9 +46,13 @@ class MarkovManager {
             this.markovData.import(JSON.parse(corpus));
         }
         catch {
-            winston.info("Couldn't read corpus, creating a new one");
-            this.markovData.addData(messageArray);
-            this.exportData();
+            if (messageArray) {
+                winston.info("Couldn't read corpus, creating a new one");
+                this.markovData.addData(messageArray);
+                this.exportData();
+            } else {
+                winston.info("No corpus or message dump could be found, markov-generated strings might be low-quality for a while");
+            }
         }
         winston.info("Finished adding data");
         return;

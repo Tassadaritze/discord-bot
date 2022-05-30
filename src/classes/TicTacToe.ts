@@ -3,7 +3,7 @@ import {
     Collection,
     CommandInteraction, InteractionReplyOptions, Message,
     MessageActionRow,
-    MessageButton,
+    MessageButton, MessageEditOptions,
     MessageSelectMenu, SelectMenuInteraction, Snowflake, TextChannel,
 } from "discord.js";
 import winston from "winston";
@@ -26,7 +26,7 @@ class TicTacToe {
     readonly players: Snowflake[];
     #channel: TextChannel;
     #interaction: CommandInteraction;
-    #message: InteractionReplyOptions | undefined;
+    #message: MessageEditOptions | undefined;
     #latestInvitation: Message | null = null;
     #isGameActive = false;
 
@@ -61,7 +61,7 @@ class TicTacToe {
             await this.#setupUserSelect();
         else
             await this.#setupPlayerInvite();
-        const message = await this.#interaction.reply({ ...this.#message, fetchReply: true });
+        const message = await this.#interaction.reply({ ...<InteractionReplyOptions>this.#message, fetchReply: true });
 
         if (this.players.length > 1 && message instanceof Message)
             this.#latestInvitation = await message.reply(`_<@${this.players[1]}> You've been invited to a game of Tic-Tac-Toe. Press the checkmark in the message above to accept, or the cross to decline._`);
