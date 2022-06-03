@@ -27,6 +27,12 @@ export default {
         }
         catch (e) {
             winston.error(e);
+            console.log(e);
+            const error = <Error>e;
+            if (error) {
+                console.log(error.name);
+                console.log(error.message);
+            }
             interaction.editReply(`**${tag ? `${tag}`.replaceAll("_", "\\_") : "random"}:** _Couldn't connect to Danbooru._`)
                 .catch(winston.error);
             return;
