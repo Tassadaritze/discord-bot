@@ -15,7 +15,7 @@ class RoleManager {
     // Imports previously created list from file
     private import = (): void => {
         try {
-            const data = fs.readFileSync("./persistent.json", "utf8");
+            const data = fs.readFileSync("./storage/role_colour_randomizer.json", "utf8");
             this._roles = JSON.parse(data, (k, v) => {
                 if (typeof v === "object" && v !== null)
                     if (v.dataType === "Map")
@@ -24,13 +24,13 @@ class RoleManager {
             });
         }
         catch {
-            winston.info("Couldn't read saved role colour randomizer data from disc")
+            winston.info("Couldn't read saved role colour randomizer data from disc");
         }
     };
 
     // Exports current state of the list to file
     private export = (): void => {
-        fs.writeFileSync("./persistent.json", JSON.stringify(this.roles, (k, v) => {
+        fs.writeFileSync("./storage/role_colour_randomizer.json", JSON.stringify(this.roles, (k, v) => {
             if (v instanceof Map) {
                 return {
                     dataType: "Map",

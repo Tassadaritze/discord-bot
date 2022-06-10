@@ -6,6 +6,11 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import fs from "fs";
 import winston from "winston";
 
+import initialize from "./log.js";
+
+// initialize logger
+initialize();
+
 const commands: SlashCommandBuilder[] = [];
 const commandFiles = fs.readdirSync("./build/commands").filter(file => file.endsWith(".js"));
 
