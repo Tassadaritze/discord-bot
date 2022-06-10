@@ -2,8 +2,10 @@
 /node_modules/
 /build/
 /logs/
+/storage/
 /.idea/
 /*.env
 /*.txt
 /*.json
 /*.bat
+/*.sh

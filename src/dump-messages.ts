@@ -3,6 +3,10 @@ import fsPromises from "fs/promises";
 import { Client, Collection, Intents, Message, Snowflake, TextChannel } from "discord.js";
 import winston from "winston";
 
+import initialize from "./log.js";
+
+// initialize logger
+initialize();
 
 const getChannelMessages = async (channel: TextChannel): Promise<string[]> => {
     let channelMessages: Collection<string, Message> = new Collection<string, Message>();
