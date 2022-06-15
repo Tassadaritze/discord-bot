@@ -5,8 +5,6 @@ import { CommandInteraction, TextChannel } from "discord.js";
 import winston from "winston";
 import * as fs from "fs";
 
-const _8_MIB = 8 * 1024 * 1024;
-
 type PostData = {
     file_size: number,
     file_url: string,
@@ -17,7 +15,14 @@ const isPostData = (object: any): object is PostData => {
     return !!(object.file_size && object.file_url && object.large_file_url);
 };
 
-// making a class for this one seems unnecessary, so I won't
+const enum NSFW {
+    NSFW,
+    Sensitive,
+    Off
+}
+
+const _8_MIB = 8 * 1024 * 1024;
+
 export default {
     data: new SlashCommandBuilder()
         .setName("danbooru")
@@ -36,14 +41,14 @@ export default {
             return;
         }
 
-        let nsfw: "nsfw" | "sensitive" | "off" = "off";
+        let nsfw: NSFW = NSFW.Off;
         if ((interaction.channel as TextChannel).nsfw) {
-            nsfw = "nsfw";
+            nsfw = NSFW.NSFW;
         } else {
             try {
                 const general = JSON.parse(fs.readFileSync("./storage/general.json", "utf-8"));
                 if (Array.isArray(general.whitelist) && general.whitelist.includes(interaction.channelId)) {
-                    nsfw = "sensitive";
+                    nsfw = NSFW.Sensitive;
                 }
             }
             catch (e) {
@@ -63,20 +68,21 @@ export default {
         }
 
         switch (nsfw) {
-            case "nsfw": {
-                if (tag && typeof tag === "string") {
+            case NSFW.NSFW: {
+                if (typeof tag === "string") {
                     params.set("tags", tag);
                 }
                 break;
             }
-            case "sensitive": {
-                tag && typeof tag === "string"
+            case NSFW.Sensitive: {
+                typeof tag === "string"
                 ? params.set("tags", `(rating:general ${tag}) or (rating:sensitive ${tag})`)
                 : params.set("tags", "rating:general or rating:sensitive");
                 break;
             }
+            case NSFW.Off:
             default: {
-                tag && typeof tag === "string"
+                typeof tag === "string"
                 ? params.set("tags", `rating:general ${tag}`)
                 : params.set("tags", "rating:general");
             }
@@ -96,7 +102,7 @@ export default {
         const data = await response.json();
         winston.info(data);
         if (!isPostData(data)) {
-            interaction.editReply(`**${tag ? `${tag}`.replaceAll("_", "\\_") : "random"}:** _Danbooru has returned an error.${!nsfw ? " (Trying this again in an NSFW channel might help.)" : ""}_`)
+            interaction.editReply(`**${tag ? `${tag}`.replaceAll("_", "\\_") : "random"}:** _Danbooru has returned an error.${nsfw !== NSFW.NSFW ? " (Trying this again in an NSFW channel might help.)" : ""}_`)
                 .catch(winston.error);
             return;
         }
