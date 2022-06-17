@@ -1,4 +1,3 @@
-import "../../env/env.js";
 import fetch from "node-fetch";
 import { SlashCommandBuilder, SlashCommandStringOption } from "@discordjs/builders";
 import { CommandInteraction, TextChannel } from "discord.js";

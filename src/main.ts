@@ -1,4 +1,4 @@
-import "../env/env.js";
+import "dotenv/config";
 import fs from "fs";
 import { Intents } from "discord.js";
 import winston from "winston";

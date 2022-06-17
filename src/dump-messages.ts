@@ -1,4 +1,4 @@
-import "../env/env.js";
+import "dotenv/config";
 import fsPromises from "fs/promises";
 import { Client, Collection, Intents, Message, Snowflake, TextChannel } from "discord.js";
 import winston from "winston";

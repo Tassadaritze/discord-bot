@@ -1,4 +1,4 @@
-import "../env/env.js";
+import "dotenv/config";
 import { Client, Intents } from "discord.js";
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
