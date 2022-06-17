@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 import { SlashCommandBuilder, SlashCommandStringOption } from "@discordjs/builders";
-import { CommandInteraction, TextChannel } from "discord.js";
+import { CommandInteraction, MessageAttachment, TextChannel } from "discord.js";
 import winston from "winston";
 import * as fs from "fs";
 
@@ -62,8 +62,10 @@ export default {
         });
 
         let tag = interaction.options.get("tag")?.value;
+        let replyTag = "random";
         if (typeof tag === "string") {
             tag = tag.trim().replaceAll(" ", "_");
+            replyTag = tag.replaceAll("_", "\\_");
         }
 
         switch (nsfw) {
@@ -93,7 +95,7 @@ export default {
         }
         catch (e) {
             winston.error(e);
-            interaction.editReply(`**${tag ? `${tag}`.replaceAll("_", "\\_") : "random"}:** _Couldn't connect to Danbooru._`)
+            interaction.editReply(`**${replyTag}:** _Couldn't connect to Danbooru._`)
                 .catch(winston.error);
             return;
         }
@@ -101,24 +103,48 @@ export default {
         const data = await response.json();
         winston.info(data);
         if (!isPostData(data)) {
-            interaction.editReply(`**${tag ? `${tag}`.replaceAll("_", "\\_") : "random"}:** _Danbooru has returned an error.${nsfw !== NSFW.NSFW ? " (Trying this again in an NSFW channel might help.)" : ""}_`)
+            interaction.editReply(`**${replyTag}:** _Danbooru has returned an error.${nsfw !== NSFW.NSFW ? " (Trying this again in an NSFW channel might help.)" : ""}_`)
                 .catch(winston.error);
             return;
         }
 
         const image = data.file_size > _8_MIB ? sanitize(data.large_file_url) : sanitize(data.file_url);
         if (data.file_size > _8_MIB && data.large_file_url === data.file_url) {
-            interaction.editReply(`**${tag ? `${tag}`.replaceAll("_", "\\_") : "random"}:** _Image too large, posting link instead:_`)
+            interaction.editReply(`**${replyTag}:** _Image too large, posting link instead:_`)
                 .catch(winston.error);
             if (interaction.channel)
                 await interaction.channel.send(data.file_url);
             return;
         }
 
-        interaction.editReply({
-            content: image ? `**${tag ? `${tag}`.replaceAll("_", "\\_") : "random"}:**` : "_Couldn't download image from unsafe URL._",
-            files: image ? [image] : undefined
-        }).catch(winston.error);
+        if (image) {
+            try {
+                const response = await fetch(image);
+
+                if (!response.body) {
+                    const e = "Fetched image stream is null";
+                    winston.error(e);
+                    interaction.editReply(`**${replyTag}:** _${e}._`)
+                        .catch(winston.error);
+                    return;
+                }
+
+                const attachment = new MessageAttachment(response.body);
+                interaction.editReply({
+                    content: `**${replyTag}:**`,
+                    files: [attachment]
+                })
+                    .catch(winston.error);
+            }
+            catch (e) {
+                winston.error(e);
+                interaction.editReply(`**${replyTag}:** _Couldn't connect to Danbooru._`)
+                    .catch(winston.error);
+            }
+        } else {
+            interaction.editReply(`**${replyTag}:** _Couldn't download image from unsafe URL._`)
+                .catch(winston.error);
+        }
     }
 };
 
