@@ -81,7 +81,7 @@ class TicTacToe {
             return;
 
         const members = await this.#channel.guild.members.fetch();
-        const nonBotMembers = members.filter(member => member.id !== this.players[0]);    // !member.user.bot && member.id !== this.#players[0]
+        const nonBotMembers = members.filter(member => !member.user.bot && member.id !== this.players[0]);
         if (nonBotMembers.size > 0) {
             while (nonBotMembers.size > 25) {
                 const random = nonBotMembers.randomKey();
