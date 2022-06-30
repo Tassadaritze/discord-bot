@@ -10,7 +10,8 @@ export default {
         .addUserOption(
             new SlashCommandUserOption()
                 .setName("opponent")
-                .setDescription("Pick your opponent (omit to let someone join later)")),
+                .setDescription("Pick your opponent (omit to let someone join later)")
+        ),
     async execute(interaction: CommandInteraction) {
         const opponent = interaction.options.getUser("opponent");
 
@@ -25,15 +26,15 @@ export default {
         }
 
         const client = interaction.client as ClientPlus;
-        if (interaction.channel && client.tictactoe.has(interaction.channel.id) && client.tictactoe.get(interaction.channel.id)?.has(interaction.user.id)) {
+        if (
+            interaction.channel &&
+            client.tictactoe.has(interaction.channel.id) &&
+            client.tictactoe.get(interaction.channel.id)?.has(interaction.user.id)
+        ) {
             await interaction.reply("_You already have a game running in this channel!_");
             return;
         }
 
-        let tictactoe: TicTacToe;
-        if (opponent)
-            tictactoe = new TicTacToe([interaction.user.id, opponent.id], interaction);
-        else
-            tictactoe = new TicTacToe([interaction.user.id], interaction);
+        new TicTacToe(interaction.user, interaction, opponent);
     }
-}
+};

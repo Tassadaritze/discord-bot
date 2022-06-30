@@ -5,4 +5,4 @@ export default {
     execute(error: Error) {
         winston.error(error);
     }
-}
+};

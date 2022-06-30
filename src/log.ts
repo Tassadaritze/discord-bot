@@ -1,4 +1,4 @@
-import * as util from "util"
+import * as util from "util";
 import winston from "winston";
 import "winston-daily-rotate-file";
 
@@ -7,7 +7,12 @@ const initialize = () => {
         format: winston.format.combine(
             winston.format.colorize({ colors: { error: "red", info: "cyan", debug: "magenta", silly: "brightGreen" } }),
             winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-            winston.format.printf(info => `${info.timestamp} ${info.level}: ${typeof info.message === "object" ? util.inspect(info.message, { colors: true }) : info.message}`)
+            winston.format.printf(
+                (info) =>
+                    `${typeof info.timestamp === "string" ? info.timestamp : "non-string timestamp"} ${info.level}: ${
+                        typeof info.message === "object" ? util.inspect(info.message, { colors: true }) : info.message
+                    }`
+            )
         ),
         level: "silly",
         transports: [
@@ -29,6 +34,6 @@ const initialize = () => {
     winston.silly("silly test");
     winston.info({ nested: { object: "test" } });
      */
-}
+};
 
 export default initialize;

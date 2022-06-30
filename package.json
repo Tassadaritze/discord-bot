@@ -1,11 +1,13 @@
 {
   "name": "discord-bot",
-  "version": "0.12.3",
+  "version": "0.13.0",
   "description": "A personal bot for Discord",
   "main": "./build/main.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .",
+    "postlint": "prettier --write \"{**/*,*}.{js,ts,jsx,tsx}\"",
     "watch": "tsc --watch",
     "predebianBuild": "rm -rf build",
     "debianBuild": "tsc --build",
@@ -19,10 +21,18 @@
   "author": "tassad",
   "license": "GPL-3.0-or-later",
   "private": true,
+  "prettier": {
+    "printWidth": 120,
+    "tabWidth": 4,
+    "trailingComma": "none",
+    "endOfLine": "lf"
+  },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.4.0",
-    "@typescript-eslint/parser": "^5.4.0",
-    "eslint": "^8.3.0",
+    "@typescript-eslint/eslint-plugin": "^5.30.0",
+    "@typescript-eslint/parser": "^5.30.0",
+    "eslint": "^8.18.0",
+    "eslint-config-prettier": "^8.5.0",
+    "prettier": "^2.7.1",
     "typescript": "^4.6.3"
   },
   "dependencies": {

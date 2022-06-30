@@ -1,32 +1,9 @@
-import {
-    ButtonInteraction,
-    Client,
-    Collection,
-    CommandInteraction,
-    Interaction,
-    SelectMenuInteraction
-} from "discord.js";
+import { ButtonInteraction, Interaction, SelectMenuInteraction } from "discord.js";
 import winston from "winston";
+
 import ClientPlus from "../classes/ClientPlus.js";
 import TicTacToe from "../classes/TicTacToe.js";
-
-
-export type Command = {
-    execute: (arg0: CommandInteraction) => Promise<void>
-}
-
-function isCommand(test: unknown): test is Command {
-    return (test as Command).execute !== undefined;
-}
-
-interface ClientWithCommands extends Client {
-    commands: Collection<string, Command>
-}
-
-function isClientWithCommands(client: unknown): client is ClientWithCommands {
-    return (client as ClientWithCommands).commands !== undefined;
-}
-
+import { isClientWithCommands, isCommand } from "../types.js";
 
 export default {
     name: "interactionCreate",
@@ -37,25 +14,31 @@ export default {
         } else if (interaction.isSelectMenu()) {
             await handleSelectMenuInteraction(interaction);
             return;
-        } else if (!interaction.isCommand())
+        } else if (!interaction.isCommand()) {
             return;
+        }
 
-        if (!isClientWithCommands(interaction.client))
+        if (!isClientWithCommands(interaction.client)) {
             return;
+        }
 
         const command = interaction.client.commands.get(interaction.commandName);
 
-        if (!command || !isCommand(command))
+        if (!command || !isCommand(command)) {
             return;
+        }
 
         try {
             await command.execute(interaction);
         } catch (error) {
             winston.error(error);
-            await interaction.reply({ content: "There was an error executing this command", ephemeral: true });
+            await interaction.reply({
+                content: "There was an error executing this command",
+                ephemeral: true
+            });
         }
     }
-}
+};
 
 const handleButtonInteraction = async (interaction: ButtonInteraction) => {
     // console.log("[BUTTON INTERACTION]", interaction, interaction.customId);
@@ -67,54 +50,64 @@ const handleButtonInteraction = async (interaction: ButtonInteraction) => {
 
     // if game is not tracked on client, then we shouldn't be trying to do anything with it
     if (!tictactoe) {
-        await interaction.reply({ content: "_That game has already ended._", ephemeral: true });
+        await interaction.reply({
+            content: "_That game has already ended._",
+            ephemeral: true
+        });
         return;
     }
 
-    if (action === "accept" || action === "decline")
+    if (action === "accept" || action === "decline") {
         await handleTicTacToeInvitation(interaction, tictactoe, action);
-    else
+    } else {
         await handleTicTacToeMove(interaction, tictactoe, action);
-}
+    }
+};
 
 const handleTicTacToeInvitation = async (interaction: ButtonInteraction, tictactoe: TicTacToe, action: string) => {
     if (interaction.user.id !== tictactoe.players[1]) {
         await interaction.reply({
-            content: `_You have not been invited to participate in this game!_`,
+            content: "_You have not been invited to participate in this game!_",
             ephemeral: true
         });
         return;
     }
 
     switch (action) {
-    case "accept":
-        await tictactoe.acceptInvite(interaction);
-        break;
-    case "decline":
-        await tictactoe.declineInvite(interaction);
-        break;
-    default:
-        winston.error("[ERROR] Got invalid value for tic-tac-toe action.");
-        await interaction.reply({ content: "_It seems like an error occurred._", ephemeral: true });
-        return;
+        case "accept": {
+            await tictactoe.acceptInvite(interaction);
+            break;
+        }
+        case "decline": {
+            await tictactoe.declineInvite(interaction);
+            break;
+        }
+        default: {
+            winston.error("[ERROR] Got invalid value for tic-tac-toe action.");
+            await interaction.reply({
+                content: "_It seems like an error occurred._",
+                ephemeral: true
+            });
+            return;
+        }
     }
 };
 
 const handleTicTacToeMove = async (interaction: ButtonInteraction, tictactoe: TicTacToe, action: string) => {
     if (!tictactoe.players.includes(interaction.user.id)) {
         await interaction.reply({
-            content: `_You are not a participant in this game!_`,
+            content: "_You are not a participant in this game!_",
             ephemeral: true
         });
         return;
     }
 
     if (
-        tictactoe.isXTurn && interaction.user.id === tictactoe.players[1] ||
-        !tictactoe.isXTurn && interaction.user.id === tictactoe.players[0]
+        (tictactoe.isXTurn && interaction.user.id === tictactoe.players[1]) ||
+        (!tictactoe.isXTurn && interaction.user.id === tictactoe.players[0])
     ) {
         await interaction.reply({
-            content: `_It's not your turn!_`,
+            content: "_It's not your turn!_",
             ephemeral: true
         });
         return;
@@ -122,7 +115,7 @@ const handleTicTacToeMove = async (interaction: ButtonInteraction, tictactoe: Ti
 
     const [v, h] = action.split(",");
     await tictactoe.takeTurn(+v, +h, interaction);
-}
+};
 
 const handleSelectMenuInteraction = async (interaction: SelectMenuInteraction) => {
     // console.log("[SELECT MENU INTERACTION]", interaction, interaction.customId);
@@ -130,7 +123,10 @@ const handleSelectMenuInteraction = async (interaction: SelectMenuInteraction) =
     // the only current select menu has both minValues and maxValues of 1
     if (interaction.values.length !== 1) {
         winston.error("[ERROR] Length of select menu interaction value array is somehow not 1.");
-        await interaction.reply({ content: "_It seems like an error occurred._", ephemeral: true });
+        await interaction.reply({
+            content: "_It seems like an error occurred._",
+            ephemeral: true
+        });
         return;
     }
 
@@ -141,13 +137,19 @@ const handleSelectMenuInteraction = async (interaction: SelectMenuInteraction) =
 
     // if game is not tracked on client, then we shouldn't be trying to do anything with it
     if (!tictactoe) {
-        await interaction.reply({ content: "_That game has already ended._", ephemeral: true });
+        await interaction.reply({
+            content: "_That game has already ended._",
+            ephemeral: true
+        });
         return;
     }
 
     // only the user who created the game may invite players
     if (tictactoe.players[0] !== interaction.user.id) {
-        await interaction.reply({ content: "_Only the game owner may invite players!_", ephemeral: true });
+        await interaction.reply({
+            content: "_Only the game owner may invite players!_",
+            ephemeral: true
+        });
         return;
     }
 
@@ -155,6 +157,9 @@ const handleSelectMenuInteraction = async (interaction: SelectMenuInteraction) =
         await tictactoe.invitePlayer(interaction.values[0], interaction);
     } catch (e) {
         winston.error(e);
-        await interaction.reply({ content: "_It seems like an error occurred._", ephemeral: true });
+        await interaction.reply({
+            content: "_It seems like an error occurred._",
+            ephemeral: true
+        });
     }
-}
+};
