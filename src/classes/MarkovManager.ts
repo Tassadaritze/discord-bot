@@ -71,7 +71,11 @@ class MarkovManager {
 
     // Sets markov interval in channel, and returns its id
     #startMarkovInterval = (channel: TextChannel): NodeJS.Timer => {
-        return setInterval(() => void channel.send(this.generate()).catch(winston.error), this.#messageInterval);
+        return setInterval(() => {
+            if (channel.lastMessage && channel.lastMessage.author.id !== channel.client.user?.id) {
+                channel.send(this.generate()).catch(winston.error);
+            }
+        }, this.#messageInterval);
     };
 
     // Generate a markov result
