@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { CommandInteraction } from "discord.js";
+import { CommandInteraction, TextChannel } from "discord.js";
 import winston from "winston";
 import ClientPlus from "../classes/ClientPlus";
 
@@ -14,8 +14,8 @@ export default {
             client.markov.stopMarkovSpam(interaction.channelId);
             await interaction.reply("_I shouldn't shitpost in here any more? Fine..._");
         } else {
-            if (interaction.channel) {
-                client.markov.startMarkovSpam(client, interaction.channel);
+            if (interaction.channel instanceof TextChannel) {
+                client.markov.startMarkovSpam(interaction.channel);
                 await interaction.reply("_Finally I can be myself again!_");
             } else {
                 winston.error("Couldn't find channel to start Markov spam in");

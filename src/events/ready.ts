@@ -12,8 +12,8 @@ export default {
             client.channels
                 .fetch("464502359372857355")
                 .then((channel) => {
-                    if (channel) {
-                        client.markov.startMarkovSpam(client, channel);
+                    if (channel instanceof TextChannel) {
+                        client.markov.startMarkovSpam(channel);
                     }
                 })
                 .catch(winston.error);

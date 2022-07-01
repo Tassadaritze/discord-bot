@@ -1,34 +1,34 @@
 import Markov from "markov-strings";
 import type { MarkovImportExport } from "markov-strings";
-import { AnyChannel, Client } from "discord.js";
+import type { TextChannel } from "discord.js";
 import fs from "fs";
 import winston from "winston";
 
 class MarkovManager {
-    private readonly markovData: Markov;
-    private markov: Record<string, NodeJS.Timer> | undefined;
-    private messageInterval = 5 * 60 * 1000;
-    private exportInterval = 10 * 60 * 1000;
-    private previousExport: string | undefined;
+    readonly #markovData: Markov;
+    #markov: Record<string, NodeJS.Timer> | undefined;
+    #messageInterval = 5 * 60 * 1000;
+    #exportInterval = 10 * 60 * 1000;
+    #previousExport: string | undefined;
 
     constructor() {
-        this.markovData = new Markov({ stateSize: 3 });
-        this.addData();
+        this.#markovData = new Markov({ stateSize: 3 });
+        this.#addData();
 
         setInterval(() => {
-            const data = JSON.stringify(this.markovData.export());
+            const data = JSON.stringify(this.#markovData.export());
 
-            if (data === this.previousExport) {
+            if (data === this.#previousExport) {
                 return;
             }
 
-            this.previousExport = data;
-            this.exportData();
-        }, this.exportInterval);
+            this.#previousExport = data;
+            this.#exportData();
+        }, this.#exportInterval);
     }
 
     // Imports data from plain text and exports it to file, or imports it from a previously exported file
-    private addData = (): void => {
+    #addData = (): void => {
         let messageArray;
         try {
             const messages = fs.readFileSync("./message-dump.txt", "utf8");
@@ -45,13 +45,13 @@ class MarkovManager {
             const parsed = JSON.parse(corpus) as unknown;
             if (!!parsed && typeof parsed === "object") {
                 // idk how the fuck to typecheck this
-                this.markovData.import(parsed as MarkovImportExport);
+                this.#markovData.import(parsed as MarkovImportExport);
             }
         } catch {
             if (messageArray) {
                 winston.info("Couldn't read corpus, creating a new one");
-                this.markovData.addData(messageArray);
-                this.exportData();
+                this.#markovData.addData(messageArray);
+                this.#exportData();
             } else {
                 winston.info(
                     "No corpus or message dump could be found, markov-generated strings might be low-quality for a while"
@@ -63,65 +63,56 @@ class MarkovManager {
     };
 
     // Exports markov data to file
-    private exportData = (): void => {
-        fs.writeFileSync("./markov-corpus.json", JSON.stringify(this.markovData.export()));
+    #exportData = (): void => {
+        fs.writeFileSync("./markov-corpus.json", JSON.stringify(this.#markovData.export()));
         winston.info("Exported corpus");
         return;
     };
 
     // Sets markov interval in channel, and returns its id
-    private startMarkovInterval = (markov: Markov, client: Client, channel: AnyChannel): NodeJS.Timer => {
-        return setInterval(() => {
-            if (
-                channel.isText() &&
-                channel.lastMessage &&
-                client.user &&
-                channel.lastMessage.author.id !== client.user.id
-            ) {
-                const generated = markov.generate({
-                    maxTries: 1000,
-                    filter: (result) => {
-                        return result.score > 10 && result.refs.length > 1;
-                    }
-                });
-                winston.info(generated);
-                if (generated.string.toLowerCase().includes("index")) {
-                    winston.silly("Incorrect opinion detected, activating override");
-                    channel
-                        .send(
-                            `I was going to say something like \`${generated.string}\`, but then I remembered that's incorrect.`
-                        )
-                        .catch(winston.error);
-                } else {
-                    channel.send(generated.string).catch(winston.error);
-                }
+    #startMarkovInterval = (channel: TextChannel): NodeJS.Timer => {
+        return setInterval(() => void channel.send(this.generate()).catch(winston.error), this.#messageInterval);
+    };
+
+    // Generate a markov result
+    generate = (): string => {
+        const generated = this.#markovData.generate({
+            maxTries: 1000,
+            filter: (result) => {
+                return result.score > 10 && result.refs.length > 1;
             }
-        }, this.messageInterval);
+        });
+        winston.info(generated);
+        if (generated.string.toLowerCase().includes("index")) {
+            winston.silly("Incorrect opinion detected, activating override");
+            return `I was going to say something like \`${generated.string}\`, but then I remembered that's incorrect.`;
+        } else {
+            return generated.string;
+        }
     };
 
     // Adds a single string to markov data
     addString = (string: string): void => {
-        this.markovData.addData([string]);
+        this.#markovData.addData([string]);
         return;
     };
 
     // Gets object containing channel ids and corresponding markov intervals
     getMarkov = (): Record<string, NodeJS.Timer> | undefined => {
-        return this.markov;
+        return this.#markov;
     };
 
     // Starts a new markov interval in provided channel, and adds entry to markov object
-    startMarkovSpam = (client: Client, channel: AnyChannel): void => {
-        this.markov = { ...this.markov, [channel.id]: this.startMarkovInterval(this.markovData, client, channel) };
+    startMarkovSpam = (channel: TextChannel): void => {
+        this.#markov = { ...this.#markov, [channel.id]: this.#startMarkovInterval(channel) };
         return;
     };
 
     // Stops the markov interval in provided channel, and removes entry from markov object
     stopMarkovSpam = (id: string): void => {
-        const markov = this.getMarkov();
-        if (markov && Object.keys(markov).includes(id)) {
-            clearInterval(markov[id]);
-            delete markov[id];
+        if (this.#markov && Object.keys(this.#markov).includes(id)) {
+            clearInterval(this.#markov[id]);
+            delete this.#markov[id];
         } else {
             winston.error(`Couldn't clear markov interval in channel with id ${id}`);
         }
