@@ -1,9 +1,9 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { CommandInteraction, TextChannel } from "discord.js";
+import type { CommandInteraction, TextChannel } from "discord.js";
 import * as fs from "fs";
 import winston from "winston";
 
-import { isGeneralStorage } from "../types.js";
+import { isGeneralStorage } from "../types";
 
 export default {
     data: new SlashCommandBuilder()

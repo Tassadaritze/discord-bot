@@ -1,13 +1,13 @@
 import "dotenv/config";
-import { Client, Intents } from "discord.js";
+import { Client, GatewayIntentBits } from "discord.js";
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
-import { SlashCommandBuilder } from "@discordjs/builders";
+import type { SlashCommandBuilder } from "@discordjs/builders";
 import fs from "fs";
 import winston from "winston";
 
-import initialize from "./log.js";
-import { isCommand } from "./types.js";
+import initialize from "./log";
+import { isCommand } from "./types";
 
 // initialize logger
 initialize();
@@ -24,7 +24,7 @@ for (const file of commandFiles) {
     commands.push(command.data.toJSON());
 }
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 await client.login(process.env.DISCORD_TOKEN);
 
 if (process.env.DISCORD_TOKEN) {

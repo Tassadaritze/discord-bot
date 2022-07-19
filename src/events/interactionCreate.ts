@@ -1,20 +1,22 @@
-import { ButtonInteraction, Interaction, SelectMenuInteraction } from "discord.js";
+import type { ButtonInteraction, Interaction, SelectMenuInteraction } from "discord.js";
+import { InteractionType } from "discord.js";
 import winston from "winston";
 
-import ClientPlus from "../classes/ClientPlus.js";
-import TicTacToe from "../classes/TicTacToe.js";
-import { isClientWithCommands, isCommand } from "../types.js";
+import type ClientPlus from "../classes/ClientPlus";
+import type TicTacToe from "../classes/TicTacToe";
+import { isClientWithCommands, isCommand } from "../types";
 
 export default {
     name: "interactionCreate",
     async execute(interaction: Interaction) {
+        // thank you discord.js
         if (interaction.isButton()) {
             await handleButtonInteraction(interaction);
             return;
         } else if (interaction.isSelectMenu()) {
             await handleSelectMenuInteraction(interaction);
             return;
-        } else if (!interaction.isCommand()) {
+        } else if (interaction.type !== InteractionType.ApplicationCommand) {
             return;
         }
 

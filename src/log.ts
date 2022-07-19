@@ -10,7 +10,11 @@ const initialize = () => {
             winston.format.printf(
                 (info) =>
                     `${typeof info.timestamp === "string" ? info.timestamp : "non-string timestamp"} ${info.level}: ${
-                        typeof info.message === "object" ? util.inspect(info.message, { colors: true }) : info.message
+                        typeof info.message === "object"
+                            ? util.inspect(info.message, { colors: true })
+                            : typeof info.message === "string" || typeof info.message === "number"
+                            ? info.message
+                            : "unknown message type: " + typeof info.message
                     }`
             )
         ),

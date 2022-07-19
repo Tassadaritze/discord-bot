@@ -1,7 +1,8 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { CommandInteraction } from "discord.js";
+import type { CommandInteraction } from "discord.js";
 import winston from "winston";
-import ClientPlus from "../classes/ClientPlus";
+
+import type ClientPlus from "../classes/ClientPlus";
 
 export default {
     data: new SlashCommandBuilder()

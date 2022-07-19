@@ -1,21 +1,21 @@
 import "dotenv/config";
 import fs from "fs";
-import { Intents } from "discord.js";
+import { GatewayIntentBits } from "discord.js";
 import winston from "winston";
 
-import ClientPlus from "./classes/ClientPlus.js";
-import initialize from "./log.js";
-import { isCommand, isEvent } from "./types.js";
+import ClientPlus from "./classes/ClientPlus";
+import initialize from "./log";
+import { isCommand, isEvent } from "./types";
 
 // initialize logger
 initialize();
 
 const client = new ClientPlus({
     intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MEMBERS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_SCHEDULED_EVENTS
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildScheduledEvents
     ]
 });
 

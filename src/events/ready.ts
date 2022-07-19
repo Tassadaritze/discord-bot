@@ -1,7 +1,7 @@
-import { TextChannel } from "discord.js";
+import { ChannelType } from "discord.js";
 import winston from "winston";
 
-import ClientPlus from "../classes/ClientPlus";
+import type ClientPlus from "../classes/ClientPlus";
 
 export default {
     name: "ready",
@@ -12,7 +12,7 @@ export default {
             client.channels
                 .fetch("464502359372857355")
                 .then((channel) => {
-                    if (channel instanceof TextChannel) {
+                    if (channel?.type === ChannelType.GuildText) {
                         client.markov.startMarkovSpam(channel);
                     }
                 })
@@ -20,13 +20,13 @@ export default {
             client.channels
                 .fetch("924343631761006592")
                 .then((channel) => {
-                    if (channel instanceof TextChannel) {
+                    if (channel?.type === ChannelType.GuildText) {
                         client.eventReportChannel = channel;
                     }
                 })
                 .catch(winston.error);
         } else {
-            throw TypeError;
+            throw new Error();
         }
     }
 };

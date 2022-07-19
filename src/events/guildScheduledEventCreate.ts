@@ -1,7 +1,7 @@
-import { GuildScheduledEvent } from "discord.js";
+import type { GuildScheduledEvent } from "discord.js";
 import winston from "winston";
 
-import ClientPlus from "../classes/ClientPlus";
+import type ClientPlus from "../classes/ClientPlus";
 
 export default {
     name: "guildScheduledEventCreate",
@@ -10,9 +10,11 @@ export default {
         if (guildScheduledEvent.guildId === client.eventReportChannel?.guildId) {
             client.eventReportChannel
                 ?.send(
-                    `Event **${guildScheduledEvent.name}** was scheduled for **${toUTC(
-                        guildScheduledEvent.scheduledStartAt.toUTCString()
-                    )}.**`
+                    guildScheduledEvent.scheduledStartAt
+                        ? `Event **${guildScheduledEvent.name}** was scheduled for **${toUTC(
+                              guildScheduledEvent.scheduledStartAt.toUTCString()
+                          )}.**`
+                        : `Event **${guildScheduledEvent.name}** was created.`
                 )
                 .catch(winston.error);
         }

@@ -1,7 +1,8 @@
 import type { Message } from "discord.js";
+import { MessageType } from "discord.js";
 import winston from "winston";
 
-import ClientPlus from "../classes/ClientPlus";
+import type ClientPlus from "../classes/ClientPlus";
 
 export default {
     name: "messageCreate",
@@ -15,7 +16,7 @@ export default {
             message.reply(client.markov.generate()).catch(winston.error);
         } else if (
             message.author.id !== client.user.id &&
-            ["DEFAULT", "REPLY"].includes(message.type) &&
+            [MessageType.Default, MessageType.Reply].includes(message.type) &&
             message.content.length > 0
         ) {
             client.markov.addString(message.content);

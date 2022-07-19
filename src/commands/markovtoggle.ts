@@ -1,7 +1,9 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { CommandInteraction, TextChannel } from "discord.js";
+import type { CommandInteraction } from "discord.js";
+import { ChannelType } from "discord.js";
 import winston from "winston";
-import ClientPlus from "../classes/ClientPlus";
+
+import type ClientPlus from "../classes/ClientPlus";
 
 export default {
     data: new SlashCommandBuilder()
@@ -14,7 +16,7 @@ export default {
             client.markov.stopMarkovSpam(interaction.channelId);
             await interaction.reply("_I shouldn't shitpost in here any more? Fine..._");
         } else {
-            if (interaction.channel instanceof TextChannel) {
+            if (interaction.channel?.type === ChannelType.GuildText) {
                 client.markov.startMarkovSpam(interaction.channel);
                 await interaction.reply("_Finally I can be myself again!_");
             } else {

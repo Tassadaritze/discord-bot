@@ -1,22 +1,23 @@
+import type { ButtonInteraction, CommandInteraction, SelectMenuInteraction, Snowflake, User } from "discord.js";
 import {
-    ButtonInteraction,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
     Collection,
-    CommandInteraction,
-    InteractionReplyOptions,
     Message,
-    MessageActionRow,
-    MessageButton,
-    MessageEditOptions,
-    MessageSelectMenu,
-    SelectMenuInteraction,
-    Snowflake,
-    TextChannel,
-    User
+    SelectMenuBuilder,
+    TextChannel
 } from "discord.js";
 import winston from "winston";
-import ClientPlus from "./ClientPlus.js";
+
+import ClientPlus from "./ClientPlus";
 
 type TicTacToeSpace = "x" | "o" | null;
+
+type MyMessageOptions = {
+    content: string;
+    components?: (ActionRowBuilder<ButtonBuilder> | ActionRowBuilder<SelectMenuBuilder>)[];
+};
 
 // Manages board state
 class TicTacToe {
@@ -33,33 +34,30 @@ class TicTacToe {
     readonly players: Snowflake[];
     #channel: TextChannel;
     #interaction: CommandInteraction;
-    #message: MessageEditOptions | undefined;
+    #message: MyMessageOptions;
     #latestInvitation: Message | null = null;
     #isGameActive = false;
 
-    constructor(host: User, interaction: CommandInteraction, opponent: User | null) {
+    constructor(host: User, interaction: CommandInteraction, channel: TextChannel, opponent: User | null) {
         this.players = [host.id];
         if (opponent) {
             this.players.push(opponent.id);
         }
         this.#interaction = interaction;
-        if (!(interaction.channel instanceof TextChannel)) {
-            throw new TypeError("TicTacToe interaction channel is not instance of TextChannel");
-        }
-        this.#channel = interaction.channel;
+        this.#channel = channel;
+        this.#message = { content: `<@${this.players[0]}> vs. TBD`, components: [] };
         this.#initialize().catch(winston.error);
     }
 
     #initialize = async () => {
-        this.#message = { content: `<@${this.players[0]}> vs. TBD`, components: [] };
         for (let v = 0; v < this.#board.length; ++v) {
             // iterate through rows
-            const buttons = new MessageActionRow();
+            const buttons = new ActionRowBuilder<ButtonBuilder>();
             for (let h = 0; h < this.#board[v].length; ++h) {
                 // iterate through spaces
                 const space = this.#board[v][h];
-                const button = new MessageButton()
-                    .setStyle("SECONDARY")
+                const button = new ButtonBuilder()
+                    .setStyle(ButtonStyle.Secondary)
                     .setCustomId(`${this.#channel.id}:${this.players[0]}:${v},${h}`); // ID of channel the game is in, then ID of the user who created the game, then row index, then column index, split by a colon
                 if (space) {
                     button.setEmoji(this.#emoji[space]);
@@ -77,11 +75,11 @@ class TicTacToe {
             this.#setupPlayerInvite();
         }
         const message = await this.#interaction.reply({
-            ...(<InteractionReplyOptions>this.#message),
+            ...this.#message,
             fetchReply: true
         });
 
-        if (this.players.length > 1 && message instanceof Message) {
+        if (this.players.length > 1) {
             this.#latestInvitation = await message.reply(
                 `_<@${this.players[1]}> You've been invited to a game of Tic-Tac-Toe. Press the checkmark in the message above to accept, or the cross to decline._`
             );
@@ -116,7 +114,7 @@ class TicTacToe {
                     break;
                 }
             }
-            const userSelectMenu = new MessageSelectMenu()
+            const userSelectMenu = new SelectMenuBuilder()
                 .setCustomId(`${this.#channel.id}:${this.players[0]}`) // ID of channel the game is in, then ID of the user who created the game, split by a colon
                 .setPlaceholder("Challenge a user...");
             nonBotMembers.forEach((member) => {
@@ -127,7 +125,7 @@ class TicTacToe {
                     emoji: "🇺" // U+1F1FA -- U emoji for User
                 });
             });
-            this.#message.components.push(new MessageActionRow().addComponents(userSelectMenu));
+            this.#message.components.push(new ActionRowBuilder<SelectMenuBuilder>().addComponents(userSelectMenu));
         } else {
             this.#message = { content: "_Sorry, I couldn't find anyone on the server for you to play with!_" };
         }
@@ -140,16 +138,16 @@ class TicTacToe {
 
         this.#message.content = `<@${this.players[0]}> vs. TBD (invitation for <@${this.players[1]}> pending)`;
 
-        const acceptButton = new MessageButton()
-            .setStyle("SUCCESS")
+        const acceptButton = new ButtonBuilder()
+            .setStyle(ButtonStyle.Success)
             .setCustomId(`${this.#channel.id}:${this.players[0]}:accept`) // ID of channel the game is in, then ID of the user who created the game, then "accept", split by a colon
             .setEmoji("✔");
-        const declineButton = new MessageButton()
-            .setStyle("DANGER")
+        const declineButton = new ButtonBuilder()
+            .setStyle(ButtonStyle.Danger)
             .setCustomId(`${this.#channel.id}:${this.players[0]}:decline`) // ID of channel the game is in, then ID of the user who created the game, then "decline", split by a colon
             .setEmoji("✖");
 
-        const invitationRow = new MessageActionRow().addComponents([acceptButton, declineButton]);
+        const invitationRow = new ActionRowBuilder<ButtonBuilder>().addComponents([acceptButton, declineButton]);
 
         this.#message.components.push(invitationRow);
     };
@@ -165,25 +163,21 @@ class TicTacToe {
 
         this.#message.content = `<@${this.players[0]}> vs. TBD (invitation for <@${this.players[1]}> pending)`;
 
-        const acceptButton = new MessageButton()
-            .setStyle("SUCCESS")
+        const acceptButton = new ButtonBuilder()
+            .setStyle(ButtonStyle.Success)
             .setCustomId(`${this.#channel.id}:${this.players[0]}:accept`) // ID of channel the game is in, then ID of the user who created the game, then "accept", split by a colon
             .setEmoji("✔");
-        const declineButton = new MessageButton()
-            .setStyle("DANGER")
+        const declineButton = new ButtonBuilder()
+            .setStyle(ButtonStyle.Danger)
             .setCustomId(`${this.#channel.id}:${this.players[0]}:decline`) // ID of channel the game is in, then ID of the user who created the game, then "decline", split by a colon
             .setEmoji("✖");
 
-        const invitationRow = new MessageActionRow().addComponents([acceptButton, declineButton]);
+        const invitationRow = new ActionRowBuilder<ButtonBuilder>().addComponents([acceptButton, declineButton]);
 
         this.#message.components.pop();
         this.#message.components.push(invitationRow);
 
         await interaction.update(this.#message);
-
-        if (!(interaction.message instanceof Message)) {
-            return;
-        }
 
         this.#latestInvitation = await interaction.message.reply(
             `_<@${newPlayerId}> You've been invited to a game of Tic-Tac-Toe. Press the checkmark in the message above to accept, or the cross to decline._`
@@ -243,10 +237,6 @@ class TicTacToe {
 
         this.#message.content = `**X:** _<@${this.players[0]}>_ vs. **O:** <@${this.players[1]}>`;
 
-        if (!(interaction.message instanceof Message)) {
-            return;
-        }
-
         await interaction.message.edit(this.#message);
     };
 
@@ -305,8 +295,8 @@ class TicTacToe {
             this.#message.content = `**X:** <@${this.players[0]}> vs. **O:** <@${this.players[1]}> --- **DRAW**`;
         }
 
-        const button = new MessageButton()
-            .setStyle("SECONDARY")
+        const button = new ButtonBuilder()
+            .setStyle(ButtonStyle.Secondary)
             .setCustomId(`${this.#channel.id}:${this.players[0]}:${v},${h}`); // ID of channel the game is in, then ID of the user who created the game, then row index, then column index, split by a colon
         if (space) {
             button.setEmoji(this.#emoji[space]);
@@ -320,12 +310,10 @@ class TicTacToe {
             this.#isGameActive = false;
             const client = this.#interaction.client as ClientPlus;
             client.tictactoe.get(this.#channel.id)?.delete(this.players[0]);
-            if (message instanceof Message) {
-                if (victory) {
-                    await message.reply(`<@${this.isXTurn ? this.players[1] : this.players[0]}> has won this game!`);
-                } else {
-                    await message.reply("This game has ended in a draw.");
-                }
+            if (victory) {
+                await message.reply(`<@${this.isXTurn ? this.players[1] : this.players[0]}> has won this game!`);
+            } else {
+                await message.reply("This game has ended in a draw.");
             }
         }
     };

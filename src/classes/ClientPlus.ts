@@ -1,10 +1,12 @@
-import { Client, ClientOptions, Collection, TextChannel } from "discord.js";
-import { Command } from "../types.js";
-import MarkovManager from "./MarkovManager.js";
-import RoleManager from "./RoleManager.js";
-import TicTacToe from "./TicTacToe.js";
+import type { ClientOptions, TextChannel } from "discord.js";
+import { Client, Collection } from "discord.js";
 
-class ClientPlus extends Client {
+import { Command } from "../types";
+import MarkovManager from "./MarkovManager";
+import RoleManager from "./RoleManager";
+import TicTacToe from "./TicTacToe";
+
+export default class ClientPlus extends Client {
     commands: Collection<string, Command> = new Collection<string, Command>();
     markov: MarkovManager = new MarkovManager();
     roles: RoleManager = new RoleManager();
@@ -15,5 +17,3 @@ class ClientPlus extends Client {
         super(props);
     }
 }
-
-export default ClientPlus;

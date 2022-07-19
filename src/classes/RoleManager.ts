@@ -1,4 +1,4 @@
-import { ColorResolvable, Guild, User } from "discord.js";
+import type { ColorResolvable, Guild, User } from "discord.js";
 import fs from "fs";
 import winston from "winston";
 
@@ -121,7 +121,7 @@ class RoleManager {
     randomise = (user: User, guild: Guild): void => {
         const guildEntry = this.roles.get(user.id)?.get(guild.id);
         if (guildEntry) {
-            guild.roles.edit(guildEntry, { color: this.#randomRGB() }, "Blame Tessie").catch(winston.error);
+            guild.roles.edit(guildEntry, { color: this.#randomRGB(), reason: "Blame Tessie" }).catch(winston.error);
         }
     };
 }

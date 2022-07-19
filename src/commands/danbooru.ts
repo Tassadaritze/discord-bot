@@ -1,10 +1,11 @@
 import fetch from "node-fetch";
+import type { CommandInteraction, TextChannel } from "discord.js";
+import { AttachmentBuilder } from "discord.js";
 import { SlashCommandBuilder, SlashCommandStringOption } from "@discordjs/builders";
-import { CommandInteraction, MessageAttachment, TextChannel } from "discord.js";
 import winston from "winston";
 import * as fs from "fs";
 
-import { isGeneralStorage } from "../types.js";
+import { isGeneralStorage } from "../types";
 
 type PostData = {
     file_size: number;
@@ -132,7 +133,7 @@ export default {
                     return;
                 }
 
-                const attachment = new MessageAttachment(response.body);
+                const attachment = new AttachmentBuilder(response.body);
                 interaction
                     .editReply({
                         content: `**${replyTag}:**`,

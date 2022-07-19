@@ -1,4 +1,5 @@
-import { Client, Collection, CommandInteraction } from "discord.js";
+import type { Client, CommandInteraction } from "discord.js";
+import { Collection } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 
 export type Command = {
