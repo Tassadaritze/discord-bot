@@ -2,8 +2,8 @@ import { SlashCommandBuilder, SlashCommandUserOption } from "@discordjs/builders
 import type { CommandInteraction } from "discord.js";
 import { ChannelType } from "discord.js";
 
-import TicTacToe from "../classes/TicTacToe";
-import type ClientPlus from "../classes/ClientPlus";
+import TicTacToe from "../classes/TicTacToe.js";
+import type ClientPlus from "../classes/ClientPlus.js";
 
 export default {
     data: new SlashCommandBuilder()

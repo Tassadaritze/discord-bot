@@ -5,7 +5,7 @@ import { SlashCommandBuilder, SlashCommandStringOption } from "@discordjs/builde
 import winston from "winston";
 import * as fs from "fs";
 
-import { isGeneralStorage } from "../types";
+import { isGeneralStorage } from "../types.js";
 
 type PostData = {
     file_size: number;

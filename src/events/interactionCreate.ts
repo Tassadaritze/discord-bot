@@ -2,9 +2,9 @@ import type { ButtonInteraction, Interaction, SelectMenuInteraction } from "disc
 import { InteractionType } from "discord.js";
 import winston from "winston";
 
-import type ClientPlus from "../classes/ClientPlus";
-import type TicTacToe from "../classes/TicTacToe";
-import { isClientWithCommands, isCommand } from "../types";
+import type ClientPlus from "../classes/ClientPlus.js";
+import type TicTacToe from "../classes/TicTacToe.js";
+import { isClientWithCommands, isCommand } from "../types.js";
 
 export default {
     name: "interactionCreate",

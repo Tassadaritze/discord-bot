@@ -10,7 +10,7 @@ import {
 } from "discord.js";
 import winston from "winston";
 
-import ClientPlus from "./ClientPlus";
+import ClientPlus from "./ClientPlus.js";
 
 type TicTacToeSpace = "x" | "o" | null;
 

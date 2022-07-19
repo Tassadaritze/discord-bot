@@ -3,7 +3,7 @@ import type { CommandInteraction } from "discord.js";
 import { ChannelType } from "discord.js";
 import winston from "winston";
 
-import type ClientPlus from "../classes/ClientPlus";
+import type ClientPlus from "../classes/ClientPlus.js";
 
 export default {
     data: new SlashCommandBuilder()

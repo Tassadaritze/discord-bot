@@ -3,9 +3,9 @@ import fs from "fs";
 import { GatewayIntentBits } from "discord.js";
 import winston from "winston";
 
-import ClientPlus from "./classes/ClientPlus";
-import initialize from "./log";
-import { isCommand, isEvent } from "./types";
+import ClientPlus from "./classes/ClientPlus.js";
+import initialize from "./log.js";
+import { isCommand, isEvent } from "./types.js";
 
 // initialize logger
 initialize();

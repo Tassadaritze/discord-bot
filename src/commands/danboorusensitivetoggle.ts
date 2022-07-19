@@ -3,7 +3,7 @@ import type { CommandInteraction, TextChannel } from "discord.js";
 import * as fs from "fs";
 import winston from "winston";
 
-import { isGeneralStorage } from "../types";
+import { isGeneralStorage } from "../types.js";
 
 export default {
     data: new SlashCommandBuilder()

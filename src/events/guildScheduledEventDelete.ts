@@ -1,8 +1,8 @@
 import type { GuildScheduledEvent } from "discord.js";
 import winston from "winston";
 
-import type ClientPlus from "../classes/ClientPlus";
-import { toUTC } from "./guildScheduledEventCreate";
+import type ClientPlus from "../classes/ClientPlus.js";
+import { toUTC } from "./guildScheduledEventCreate.js";
 
 export default {
     name: "guildScheduledEventDelete",

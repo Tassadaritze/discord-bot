@@ -1,10 +1,10 @@
 import type { ClientOptions, TextChannel } from "discord.js";
 import { Client, Collection } from "discord.js";
 
-import { Command } from "../types";
-import MarkovManager from "./MarkovManager";
-import RoleManager from "./RoleManager";
-import TicTacToe from "./TicTacToe";
+import { Command } from "../types.js";
+import MarkovManager from "./MarkovManager.js";
+import RoleManager from "./RoleManager.js";
+import TicTacToe from "./TicTacToe.js";
 
 export default class ClientPlus extends Client {
     commands: Collection<string, Command> = new Collection<string, Command>();

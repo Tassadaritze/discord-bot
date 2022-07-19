@@ -6,8 +6,8 @@ import type { SlashCommandBuilder } from "@discordjs/builders";
 import fs from "fs";
 import winston from "winston";
 
-import initialize from "./log";
-import { isCommand } from "./types";
+import initialize from "./log.js";
+import { isCommand } from "./types.js";
 
 // initialize logger
 initialize();
