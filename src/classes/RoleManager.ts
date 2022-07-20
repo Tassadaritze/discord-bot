@@ -3,7 +3,7 @@ import fs from "fs";
 import winston from "winston";
 
 type RoleManagerStorageValue = {
-    v: [string, string][];
+    v: [string, string | Map<string, string>][];
     dataType: string;
 };
 
@@ -11,7 +11,9 @@ const isRoleManagerStorageValue = (obj: unknown): obj is RoleManagerStorageValue
     typeof (obj as RoleManagerStorageValue).dataType === "string" &&
     Array.isArray((obj as RoleManagerStorageValue).v) &&
     (obj as RoleManagerStorageValue).v.every((el) => el.length === 2) &&
-    (obj as RoleManagerStorageValue).v.every((el) => el.every((elem) => typeof elem === "string"));
+    (obj as RoleManagerStorageValue).v.every((el) =>
+        el.every((elem) => typeof elem === "string" || elem instanceof Map)
+    );
 
 const isRolesMap = (obj: unknown): obj is Map<string, Map<string, string>> =>
     obj instanceof Map &&
