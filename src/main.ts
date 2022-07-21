@@ -38,6 +38,10 @@ for (const file of eventFiles) {
         winston.error(`Couldn't import a valid event from ./events/${file}`);
         continue;
     }
+    if (event.name === "debug" && !process.argv.includes("debug")) {
+        winston.info("Skipping debug event as debug argument was not provided");
+        continue;
+    }
     if (event.once) {
         client.once(event.name, (...args) => event.execute(...(args as unknown[])));
     } else {
