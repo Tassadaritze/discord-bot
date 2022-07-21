@@ -2,6 +2,7 @@ import Markov from "markov-strings";
 import type { MarkovImportExport } from "markov-strings";
 import type { TextChannel } from "discord.js";
 import fs from "fs";
+import fsp from "fs/promises";
 import winston from "winston";
 
 class MarkovManager {
@@ -13,22 +14,24 @@ class MarkovManager {
 
     constructor() {
         this.#markovData = new Markov({ stateSize: 3 });
-        this.#addData();
+        this.#addData()
+            .then(() => {
+                setInterval(() => {
+                    const data = JSON.stringify(this.#markovData.export());
 
-        setInterval(() => {
-            const data = JSON.stringify(this.#markovData.export());
+                    if (data === this.#previousExport) {
+                        return;
+                    }
 
-            if (data === this.#previousExport) {
-                return;
-            }
-
-            this.#previousExport = data;
-            this.#exportData();
-        }, this.#exportInterval);
+                    this.#previousExport = data;
+                    this.#exportData().catch(winston.error);
+                }, this.#exportInterval);
+            })
+            .catch(winston.error);
     }
 
     // Imports data from plain text and exports it to file, or imports it from a previously exported file
-    #addData = (): void => {
+    #addData = async () => {
         let messageArray;
         try {
             const messages = fs.readFileSync("./message-dump.txt", "utf8");
@@ -44,14 +47,14 @@ class MarkovManager {
             const corpus = fs.readFileSync("./markov-corpus.json", "utf8");
             const parsed = JSON.parse(corpus) as unknown;
             if (!!parsed && typeof parsed === "object") {
-                // idk how the fuck to typecheck this
+                // idk how tf to typecheck this
                 this.#markovData.import(parsed as MarkovImportExport);
             }
         } catch {
             if (messageArray) {
                 winston.info("Couldn't read corpus, creating a new one");
                 this.#markovData.addData(messageArray);
-                this.#exportData();
+                await this.#exportData().catch(winston.error);
             } else {
                 winston.info(
                     "No corpus or message dump could be found, markov-generated strings might be low-quality for a while"
@@ -63,10 +66,9 @@ class MarkovManager {
     };
 
     // Exports markov data to file
-    #exportData = (): void => {
-        fs.writeFileSync("./markov-corpus.json", JSON.stringify(this.#markovData.export()));
+    #exportData = async () => {
+        await fsp.writeFile("./markov-corpus.json", JSON.stringify(this.#markovData.export()));
         winston.info("Exported corpus");
-        return;
     };
 
     // Sets markov interval in channel, and returns its id
