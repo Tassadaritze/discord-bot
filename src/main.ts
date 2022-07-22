@@ -15,6 +15,7 @@ const client = new ClientPlus({
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildScheduledEvents
     ]
 });
